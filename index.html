@@ -15,12 +15,12 @@
             min-height: 100vh; color: #333;
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { text-align: center; padding: 20px 0; color: white; }
+        header { text-align: center; padding: 16px 0; color: white; }
         h1 { font-size: 1.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .subtitle { font-size: 1rem; opacity: 0.9; }
-        .nav-buttons { display: flex; justify-content: center; gap: 20px; margin: 30px 0; }
+        .subtitle { font-size: 1rem; opacity: 1; }
+        .nav-buttons { display: flex; justify-content: center; gap: 12px; margin: 10px 0 12px; }
         .nav-btn, .btn {
-            padding: 12px 24px; border: none; border-radius: 25px; cursor: pointer;
+            padding: 12px 12px; border: none; border-radius: 25px; cursor: pointer;
             font-size: 14px; font-weight: 600; transition: all 0.3s ease;
             text-decoration: none; display: inline-block;
         }
@@ -32,13 +32,13 @@
         .nav-btn:not(.active) { background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); }
         .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
         .content-section {
-            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px;
+            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1); backdrop-filter: blur(10px);
         }
         .hidden { display: none !important; }
         .search-bar {
             width: 100%; max-width: 400px; padding: 15px; border: 2px solid #e0e0e0;
-            border-radius: 25px; font-size: 14px; margin: 0 auto 30px; display: block;
+            border-radius: 25px; font-size: 14px; margin: 0 auto 10px; display: block;
             transition: border-color 0.3s ease;
         }
         .search-bar:focus { outline: none; border-color: #667eea; }
@@ -54,10 +54,10 @@
         .photo-card.no-overlay .photo-info { position: static; background: white; color: #333; text-align: center; padding: 8px; border-top: 1px solid #eee; }
         .photo-card.no-overlay .photo-date { font-size: 10px; }
         .collection-overview { margin-bottom: 30px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; max-width: 600px; margin: 0 auto; }
-        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 130px));  justify-content: center; gap: 12px; max-width: 740px; margin: 0 auto; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 12px; border-radius: 15px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .stat-number { font-size: 1rem; font-weight: bold; margin-bottom: 5px; }
-        .stat-label { font-size: 14px; opacity: 0.9; }
+        .stat-label { font-size: 12px; opacity: 0.9; }
         .filter-section { margin-bottom: 25px; }
         .filter-tabs { display: flex; justify-content: center; gap: 2px; margin-top: 15px; flex-wrap: wrap; }
         .filter-tab { padding: 8px 16px; border: 2px solid #e0e0e0; background: white; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s ease; }
@@ -67,7 +67,7 @@
         .progress-bar { width: 100%; max-width: 400px; height: 6px; background: #e0e0e0; border-radius: 3px; margin: 0 auto 10px; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.3s ease; }
         .progress-text { font-size: 14px; color: #666; margin: 0; }
-        .load-more-section { text-align: center; margin: 30px 0; padding: 20px; }
+        .load-more-section { margin-bottom: 8px; text-align: center; padding-bottom: 12px;}
         .load-more-btn { background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; padding: 15px 30px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; }
         .load-more-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
         .remaining-count { display: block; font-size: 12px; opacity: 0.8; margin-top: 5px; }
@@ -80,7 +80,7 @@
         .timeline-section { margin-top: 20px; }
         .timeline-container { max-width: 1000px; margin: 0 auto; }
         .timeline-year { margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .timeline-year-header { background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 20px 25px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
+        .timeline-year-header { background: linear-gradient(45deg, #667eea, #764ba2); color: white; padding: 20px 25px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
         .timeline-year-header:hover { background: linear-gradient(45deg, #5a6fd8, #6a42a0); transform: translateY(-1px); }
         .timeline-year-count { font-size: 14px; opacity: 0.9; background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; }
         .timeline-year-content { padding: 25px; background: white; }
@@ -113,6 +113,12 @@
         .modal-content { background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 100%; text-align: center; position: relative; }
         .modal img { max-width: 100%; max-height: 400px; border-radius: 10px; margin-bottom: 20px; }
         .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+	.section-title{  font-size: 1rem; line-height: 1.25; margin: 6px 0 8px;}
+
+/* Optional: even smaller on phones */
+@media (max-width: 768px){
+  .section-title{ font-size: 0.95rem; }
+}
         .share-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
         .share-btn { padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
         .share-btn:hover { transform: translateY(-2px); opacity: 0.9; }
@@ -149,6 +155,13 @@
 }
 
 @media (max-width: 768px) {
+
+  /* Compact header→tabs spacing */
+  header { padding: 8px 0 6px; }
+  .header-cta{ margin-top: 2px; font-size: 11px; }
+  .nav-buttons { margin: 6px 0 8px; gap: 8px; }
+  .nav-btn, .btn { padding: 10px 10px; font-size: 13px; }
+
   #back-to-top { bottom: 80px; right: 20px; }
   .gallery-grid { 
     grid-template-columns: repeat(3, 1fr);
@@ -177,14 +190,30 @@
     text-align: center;
   }
 }
+
+  .header-cta{
+      display:inline-block;
+      margin-top:6px;
+      font-size:12px;
+      color:#fff;
+      text-decoration: underline;
+      opacity:.95;
+  }
+  .header-cta:hover{ opacity:1; }
+  #explore-links .footer-link{ margin: 4px 6px; }
+.content-section > *:last-child{ margin-bottom: 0 !important; }
+
 </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Xiao Zhan Studio Gallery<br>肖战工作室高清相册</h1>
-            <p class="subtitle">Explore high-resolution photo album from XZ Studio on Weibo and test your memory!</p>
-        </header>
+            <p class="subtitle" style="font-weight: 600; color: white;">Explore high-resolution photos from XZ Studio on Weibo and test your memory! </p>
+	    <a href="#explore-links" class="header-cta">Explore links ↓</a>
+
+
+</header>
 
         <nav class="nav-buttons">
             <button class="nav-btn active" data-section="gallery">Photo Gallery<br>工作室相册</button>
@@ -219,6 +248,13 @@
                 </div>
             </div>
 
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid">Grid View</button>
+                <button class="view-btn" data-view="timeline">Timeline View</button>
+            </div>
+
+
+
             <div class="loading-progress hidden" id="loadingProgress">
                 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
                 <p class="progress-text" id="progressText">Loading photos...</p>
@@ -238,10 +274,7 @@
                 </div>
             </div>
 
-            <div class="view-toggle">
-                <button class="view-btn active" data-view="grid">Grid View</button>
-                <button class="view-btn" data-view="timeline">Timeline View</button>
-            </div>
+            
 
             <div class="timeline-section hidden" id="timelineSection">
                 <div class="timeline-container" id="timelineContainer"></div>
@@ -251,10 +284,10 @@
         <!-- Game Section -->
         <div id="game-section" class="content-section hidden">
             <div class="game-container">
-                <h2>When Was This Photo Taken?</h2>
-                <p>Look at the photo and guess the month and year!</p>
+                <h2 class="section-title">When Was This Photo Taken?</h2>
+                <p style="font-size:13px; color:#1565C0;">Click "Start Game" to begin!</p>
                 <div style="background:#e8f4ff; padding:15px; border-radius:10px; margin:20px auto; max-width:500px; border-left:4px solid #2196F3;">
-                    <p style="margin:0; font-size:14px; color:#1565C0;"><strong>💡 猜猜看:</strong> 相框里的照片是什么时候照的？<br>点击"开始游戏！"，测试你的眼力吧！</p>
+                    <p style="margin:0; font-size:12px; color:#1565C0;"><strong>💡 猜猜看:</strong> 相框里的照片是什么时候照的？<br>点击"开始游戏！"，测试你的眼力吧！</p>
                 </div>
                 <div class="game-stats">
                     <div class="stat">Score: <span id="score">0</span></div>
@@ -628,14 +661,14 @@
                 <rect x="150" y="100" width="100" height="75" rx="10" fill="#f0f0f0" stroke="#ddd" stroke-width="2"/>
                 <text x="200" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#999">📷</text>
                 <text x="200" y="148" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">Your Photo Here</text>
-                <rect x="60" y="185" width="70" height="25" rx="12" fill="#e3f2fd" stroke="#2196F3" stroke-width="1"/>
-                <text x="95" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#1976D2">Jan</text>
-                <rect x="140" y="185" width="70" height="25" rx="12" fill="#e8f5e9" stroke="#4CAF50" stroke-width="1"/>
-                <text x="175" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2E7D32">Jun</text>
-                <rect x="220" y="185" width="70" height="25" rx="12" fill="#fff3e0" stroke="#FF9800" stroke-width="1"/>
-                <text x="255" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#F57C00">Sep</text>
-                <rect x="300" y="185" width="70" height="25" rx="12" fill="#fce4ec" stroke="#E91E63" stroke-width="1"/>
-                <text x="335" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#C2185B">Dec</text>
+                <rect x="60" y="185" width="60" height="25" rx="12" fill="#e3f2fd" stroke="#2196F3" stroke-width="1"/>
+                <text x="90" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#1976D2">Jan</text>
+                <rect x="140" y="185" width="60" height="25" rx="12" fill="#e8f5e9" stroke="#4CAF50" stroke-width="1"/>
+                <text x="170" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2E7D32">Jun</text>
+                <rect x="220" y="185" width="60" height="25" rx="12" fill="#fff3e0" stroke="#FF9800" stroke-width="1"/>
+                <text x="250" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#F57C00">Sep</text>
+                <rect x="300" y="185" width="60" height="25" rx="12" fill="#fce4ec" stroke="#E91E63" stroke-width="1"/>
+                <text x="330" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#C2185B">Dec</text>
                 <text x="200" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#667eea">Ready to test your memory?</text>
                 <text x="200" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="600" fill="#764ba2">Click "Start Game" to begin!</text>
             </svg>`;
@@ -685,17 +718,21 @@
   .site-footer {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 30px 0;
+      padding: 8px 0;
       margin-top: 50px;
       text-align: center;
+      padding-bottom: 4px;
   }
-  .footer-content { margin-bottom: 10px; }
+
+ .site-footer .footer-content:last-child { margin-bottom: 0; }
+
+  .footer-content { margin-bottom: 6px; }
   .footer-link {
       color: white;
       text-decoration: underline;
       font-weight: 700;
       display: inline-block;
-      padding: 6px 10px;
+      padding: 6px 6px;
       border-radius: 6px;
       transition: all .2s ease;
   }
@@ -703,25 +740,75 @@
   #terms-content {
       background-color: rgba(255,255,255,0.1);
       border-radius: 8px;
-      padding: 15px;
       margin: 12px auto 0;
       text-align: left;
       max-width: 700px;
+      margin-top: 6px;
+      padding: 10px 12px; 
   }
-  #terms-content ul { list-style: disc; padding-left: 20px; }
+  #terms-content ul { list-style: disc; padding-left: 20px;  margin: 6px 0 6px; }
+  #terms-content li { margin: 2px 2px; }
   #terms-toggle {
+      display: inline-block;
       background: rgba(255,255,255,0.15);
       border-radius: 999px;
-      padding: 6px 14px;
+      padding: 8px 12px; 
+      border-radius: 10px;
+      line-height: 1.15; 
+  }
+  #terms-toggle:hover{
+    text-decoration: none;
+    background: rgba(0,0,0,0.06);/* optional hover highlight */
   }
   .copyright-notice {
       opacity: .9;
-      margin-top: 12px;
+      margin-top: 0px;
       font-size: 0.95rem;
+      margin-bottom:12px;
   }
+
+  .header-cta{
+      display:inline-block;
+      margin-top:6px;
+      font-size:12px;
+      color:#fff;
+      text-decoration: underline;
+      opacity:.95;
+  }
+  .header-cta:hover{ opacity:1; }
+  #explore-links .footer-link{ margin: 4px 6px; }
+
+
+/* === Desktop-only: tighten space above the footer when Gallery is visible === */
+@media (min-width: 1024px){
+  /* The Gallery tab ends with .view-toggle; it was adding extra space */
+  #gallery-section .view-toggle{ 
+    margin-bottom: 0 !important; 
+    padding-bottom: 6px !important; 
+  }
+  /* Keep these blocks snug too */
+  #gallery-section .load-more-section{ 
+    margin-bottom: 4px !important; 
+    padding-bottom: 8px !important; 
+  }
+  #gallery-section .timeline-section{
+    margin-bottom: 0 !important;
+  }
+  /* Footer can stay compact */
+  .site-footer{ padding-bottom: 4px !important; }
+}
 </style>
 <footer class="site-footer">
   <div class="footer-content">
+
+  <div class="footer-content" id="explore-links">
+    <div style="margin-bottom:6px;font-weight:700;">Explore more</div>
+    <a class="footer-link" href="https://canadaxfx.github.io/XZworks/" target="_blank" rel="noopener">Screen Arts of Xiao Zhan</a>
+    <a class="footer-link" href="https://www.youtube.com/@CanadaXFX" target="_blank" rel="noopener">CanadaXFX YouTube Channel</a>
+  </div>
+
+  <div class="copyright-notice">&copy; 2025 CanadaXFX. All rights reserved.</div>
+
     <a href="#" id="terms-toggle" class="footer-link">Terms of Use</a>
     <div id="terms-content" style="display:none;">
       <ul>
@@ -733,7 +820,8 @@
       </ul>
     </div>
   </div>
-  <div class="copyright-notice">&copy; 2025 CanadaXFX. All rights reserved.</div>
+  
+
 </footer>
 <script>
   (function(){
