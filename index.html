@@ -87,16 +87,77 @@
             font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
             transition: all 0.3s ease;
             user-select: none;
+            position: relative;
+        }
+        
+        .timeline-year-header::after {
+            content: "Click to view " attr(data-photo-count) " photos";
+            position: absolute;
+            bottom: 5px;
+            left: 20px;
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: normal;
+            font-style: italic;
         }
         
         .timeline-year-header:hover { 
             background: linear-gradient(45deg, #5a6fd8, #6a42a0); 
             transform: translateY(-1px); 
+        }
+        
+        .year-header-content {
+            width: 100%;
+        }
+        
+        .year-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .year-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .year-preview {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+        
+        .timeline-year.expanded .year-preview {
+            display: none;
+        }
+        
+        .preview-thumb {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .preview-thumb:hover {
+            transform: scale(1.1);
+            border-color: rgba(255,255,255,0.6);
+        }
+        
+        .preview-more {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.3);
         }
         
         .timeline-year-count { 
@@ -395,6 +456,29 @@
                 padding: 12px 15px;
                 font-size: 14px;
             }
+            .timeline-year-header::after {
+                font-size: 10px;
+                left: 15px;
+                bottom: 4px;
+            }
+            .year-header-top {
+                margin-bottom: 8px;
+            }
+            .year-title {
+                font-size: 14px;
+            }
+            .timeline-year-count {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+            .preview-thumb {
+                width: 28px;
+                height: 28px;
+            }
+            .preview-more {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
             .timeline-year-content {
                 padding: 15px;
             }
@@ -576,6 +660,15 @@
             createTimelineHTML(photosByYear);
             updateStats();
             initializeGame();
+            
+            // Auto-expand the most recent year
+            const sortedYears = Object.keys(photosByYear).sort((a, b) => parseInt(b) - parseInt(a));
+            if (sortedYears.length > 0) {
+                const mostRecentYear = sortedYears[0];
+                setTimeout(() => {
+                    toggleYear(mostRecentYear);
+                }, 100);
+            }
         }
 
         /* ---------- Timeline HTML Generation ---------- */
@@ -587,13 +680,29 @@
                 const displayCount = yearPhotoDisplayCount[year] || PHOTOS_PER_YEAR_INITIAL;
                 const hasMore = photos.length > displayCount;
                 
+                // Create preview thumbnails for collapsed state
+                const previewPhotos = photos.slice(0, 4);
+                const previewHTML = `
+                    <div class="year-preview">
+                        ${previewPhotos.map(photo => `
+                            <img src="${photo.url}" alt="Preview" class="preview-thumb">
+                        `).join('')}
+                        ${photos.length > 4 ? `<div class="preview-more">+${photos.length - 4}</div>` : ''}
+                    </div>
+                `;
+                
                 return `
-                    <div class="timeline-year" data-year="${year}">
+                    <div class="timeline-year" data-year="${year}" data-photo-count="${photos.length}">
                         <div class="timeline-year-header" onclick="toggleYear('${year}')">
-                            <span>${year}</span>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="timeline-year-count">${photos.length} photos</span>
-                                <span class="expand-icon">▼</span>
+                            <div class="year-header-content">
+                                <div class="year-header-top">
+                                    <span class="year-title">${year}</span>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="timeline-year-count">${photos.length} photos</span>
+                                        <span class="expand-icon">▼</span>
+                                    </div>
+                                </div>
+                                ${previewHTML}
                             </div>
                         </div>
                         <div class="timeline-year-content">
