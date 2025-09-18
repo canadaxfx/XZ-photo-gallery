@@ -42,13 +42,70 @@
             transition: border-color 0.3s ease;
         }
         .search-bar:focus { outline: none; border-color: #667eea; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; margin-top: 20px; }
-        .photo-card { position: relative; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; background: white; height: 160px; }
-        .photo-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.2); }
-        .photo-card img { width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.3s ease; }
+        
+        /* Optimized gallery grid with better performance */
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); 
+            gap: 12px; 
+            margin-top: 20px;
+            contain: layout style paint; /* CSS containment for better performance */
+        }
+        
+        /* Photo card optimizations */
+        .photo-card { 
+            position: relative; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            cursor: pointer; 
+            background: white; 
+            height: 160px;
+            /* Performance optimizations */
+            transform: translateZ(0); /* Hardware acceleration */
+            will-change: transform; /* Optimize for animations */
+            contain: layout style paint;
+        }
+        
+        /* Optimize hover effects */
+        .photo-card:hover { 
+            transform: translateY(-3px) translateZ(0); 
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2); 
+        }
+        
+        /* Image optimizations */
+        .photo-card img { 
+            width: 100%; 
+            height: 160px; 
+            object-fit: cover; 
+            display: block; 
+            transition: transform 0.3s ease;
+            /* Prevent layout shifts */
+            aspect-ratio: 1/1.45;
+        }
+        
+        /* Skeleton loader for images */
+        .photo-card.loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
         .photo-card:hover img { transform: scale(1.05); }
-        .photo-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; padding: 15px 8px 8px; }
+        .photo-info { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: linear-gradient(transparent, rgba(0,0,0,0.8)); 
+            color: white; 
+            padding: 15px 8px 8px; 
+        }
         .photo-date { font-size: 11px; font-weight: 600; text-align: center; flex-wrap: wrap;}
         .photo-card.no-overlay { height: auto; }
         .photo-card.no-overlay .photo-info { position: static; background: white; color: #333; text-align: center; padding: 8px; border-top: 1px solid #eee; }
@@ -113,107 +170,100 @@
         .modal-content { background: white; border-radius: 15px; padding: 30px; max-width: 500px; width: 100%; text-align: center; position: relative; }
         .modal img { max-width: 100%; max-height: 400px; border-radius: 10px; margin-bottom: 20px; }
         .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
-	.section-title{  font-size: 1rem; line-height: 1.25; margin: 6px 0 8px;}
+        .section-title{  font-size: 1rem; line-height: 1.25; margin: 6px 0 8px;}
 
-/* Optional: even smaller on phones */
-@media (max-width: 768px){
-  .section-title{ font-size: 0.95rem; }
-}
-        .share-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-        .share-btn { padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
-        .share-btn:hover { transform: translateY(-2px); opacity: 0.9; }
-    
-/* Back to Top button (inserted) */
-#back-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px; /* moved to bottom-right */
-    background-color: #667eea;
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 80%;
-    text-align: center;
-    line-height: 48px;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 9999; /* raise above everything */
-    touch-action: manipulation;
-}
-#back-to-top.visible {
-    opacity: 1;
-    visibility: visible;
-}
-#back-to-top:hover {
-    background-color: #764ba2;
-    transform: scale(1.1);
-}
+        /* Optimized back to top button */
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 80%;
+            text-align: center;
+            line-height: 48px;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 9999;
+            touch-action: manipulation;
+            transform: translateZ(0); /* Hardware acceleration */
+        }
+        #back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        #back-to-top:hover {
+            background-color: #764ba2;
+            transform: scale(1.1) translateZ(0);
+        }
 
-@media (max-width: 768px) {
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            header { padding: 8px 0 6px; }
+            .header-cta{ margin-top: 2px; font-size: 11px; }
+            .nav-buttons { margin: 6px 0 8px; gap: 8px; }
+            .nav-btn, .btn { padding: 10px 10px; font-size: 13px; }
 
-  /* Compact header→tabs spacing */
-  header { padding: 8px 0 6px; }
-  .header-cta{ margin-top: 2px; font-size: 11px; }
-  .nav-buttons { margin: 6px 0 8px; gap: 8px; }
-  .nav-btn, .btn { padding: 10px 10px; font-size: 13px; }
+            #back-to-top { bottom: 80px; right: 20px; }
+            .gallery-grid { 
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+                max-width: 100%;
+            }
+            .game-stats {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                gap: 6px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0 4px;
+            }
+            .game-stats .stat {
+                flex: 1 0 0;
+                white-space: nowrap;
+                padding: 10px 8px;
+                font-size: 12px;
+                text-align: center;
+            }
+        }
 
-  #back-to-top { bottom: 80px; right: 20px; }
-  .gallery-grid { 
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    max-width: 100%;
-  }
-  /* Force game stats into a single row on mobile */
-  .game-stats {
-    display: flex;
-    flex-wrap: nowrap;           /* don't wrap to multiple lines */
-    justify-content: space-between;
-    gap: 6px;
-    overflow-x: auto;            /* allow horizontal scroll if too tight */
-    -webkit-overflow-scrolling: touch;
-    padding: 0 4px;
-  }
-  .game-stats .stat {
-    flex: 1 0 0;                 /* each stat shares the row evenly */
-    white-space: nowrap;         /* keep label/value on one line */
-    padding: 10px 8px;
-    font-size: 12px;
-    text-align: center;
-  }
-}
+        .header-cta{
+            display:inline-block;
+            margin-top:6px;
+            font-size:12px;
+            color:#fff;
+            text-decoration: underline;
+            opacity:.95;
+        }
+        .header-cta:hover{ opacity:1; }
+        #explore-links .footer-link{ margin: 4px 6px; }
+        .content-section > *:last-child{ margin-bottom: 0 !important; }
 
-  .header-cta{
-      display:inline-block;
-      margin-top:6px;
-      font-size:12px;
-      color:#fff;
-      text-decoration: underline;
-      opacity:.95;
-  }
-  .header-cta:hover{ opacity:1; }
-  #explore-links .footer-link{ margin: 4px 6px; }
-.content-section > *:last-child{ margin-bottom: 0 !important; }
-
-</style>
+        /* Performance hint for animations */
+        .photo-card, .nav-btn, .btn, .filter-tab, .view-btn {
+            will-change: transform;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Xiao Zhan Studio Gallery<br>肖战工作室高清相册</h1>
             <p class="subtitle" style="font-weight: 600; color: white;">Explore high-resolution photos from XZ Studio on Weibo and test your memory! </p>
-	    <a href="#explore-links" class="header-cta">Explore links ↓</a>
-
-
-</header>
+            <a href="#explore-links" class="header-cta">Explore links ↓</a>
+        </header>
 
         <nav class="nav-buttons">
             <button class="nav-btn active" data-section="gallery">Photo Gallery<br>工作室相册</button>
@@ -244,7 +294,6 @@
                 <div class="filter-tabs" id="filterTabs">
                     <button class="filter-tab active" data-filter="all">All Photos</button>
                     <button class="filter-tab" data-filter="recent">Recent</button>
-                    <!-- Year tabs will be auto generated -->
                 </div>
             </div>
 
@@ -252,8 +301,6 @@
                 <button class="view-btn active" data-view="grid">Grid View</button>
                 <button class="view-btn" data-view="timeline">Timeline View</button>
             </div>
-
-
 
             <div class="loading-progress hidden" id="loadingProgress">
                 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -268,13 +315,11 @@
                     <span class="remaining-count" id="remainingCount">(999+ remaining)</span>
                 </button>
                 <div class="load-options">
+                    <button class="quick-load-btn" onclick="loadPhotos(20)">+20</button>
                     <button class="quick-load-btn" onclick="loadPhotos(50)">+50</button>
-                    <button class="quick-load-btn" onclick="loadPhotos(100)">+100</button>
                     <button class="quick-load-btn" onclick="loadAllPhotos()">Load All</button>
                 </div>
             </div>
-
-            
 
             <div class="timeline-section hidden" id="timelineSection">
                 <div class="timeline-container" id="timelineContainer"></div>
@@ -316,52 +361,132 @@
             <h3 id="modalTitle"></h3>
             <p id="modalDate"></p>
             <div class="share-buttons">
-                <!-- Only Weibo button remains -->
                 <a class="share-btn" id="weiboLinkBtn" target="_blank" rel="noopener"
                    style="background:#fa2a55; color:white; display:none;">Weibo Link</a>
             </div>
         </div>
     </div>
 
+    <!-- Back to Top Button -->
+    <div id="back-to-top">↑</div>
+
     <script>
-        /* ---------- Data bootstrapping from photoData.json ---------- */
+        /* ---------- Optimized Performance Variables ---------- */
         let photoData = [];
         let gameScore = 0, gameStreak = 0, totalQuestions = 0, currentPhoto = null, gameActive = false;
-        let displayedPhotos = [], filteredPhotos = [], currentFilter = 'all', photosPerLoad = 100, currentView = 'grid', loadedCount = 0;
+        let displayedPhotos = [], filteredPhotos = [], currentFilter = 'all', currentView = 'grid', loadedCount = 0;
+        
+        // Reduced initial load for better performance
+        let photosPerLoad = 20; // Reduced from 100 to 20
+        let imageCache = new Map(); // Image caching
+        let isLoading = false; // Prevent multiple simultaneous loads
+        
+        // Intersection Observer for lazy loading
+        let imageObserver = null;
+        
+        // Debounce function for search
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             setupNavigation();
             setupSearch();
             setupViewToggle();
-            // Only load the gallery after JSON arrives:
+            setupIntersectionObserver();
             loadPhotoData();
         });
 
+        /* ---------- Optimized Image Loading ---------- */
+        function setupIntersectionObserver() {
+            imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const photoCard = img.closest('.photo-card');
+                        
+                        if (img.dataset.src && !img.src) {
+                            img.src = img.dataset.src;
+                            img.onload = () => {
+                                photoCard.classList.remove('loading');
+                                img.removeAttribute('data-src');
+                            };
+                            img.onerror = () => {
+                                photoCard.classList.remove('loading');
+                                img.alt = 'Failed to load';
+                            };
+                        }
+                        imageObserver.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px'
+            });
+        }
+
+        /* ---------- Optimized Data Loading ---------- */
         async function loadPhotoData() {
+            if (isLoading) return;
+            isLoading = true;
+            
             showLoadingProgress();
             const cacheBuster = Date.now();
             try {
-                const res = await fetch(`photoData.json?v=${cacheBuster}`, { cache: 'no-store' });
+                const res = await fetch(`photoData.json?v=${cacheBuster}`, { 
+                    cache: 'no-store',
+                    // Add timeout
+                    signal: AbortSignal.timeout(10000)
+                });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 if (!Array.isArray(data)) throw new Error('JSON is not an array');
+                
                 photoData = data;
-                initializeAppAfterData();
+                
+                // Process data in chunks to avoid blocking
+                await processDataInChunks();
+                
             } catch (err) {
                 console.error('Failed to load photoData.json:', err);
-                alert('Could not load photo data. Ensure photoData.json is deployed next to index.html.');
+                alert('Could not load photo data. Please check your connection and try again.');
             } finally {
                 hideLoadingProgress();
+                isLoading = false;
             }
         }
 
+        /* ---------- Chunk Processing for Better Performance ---------- */
+        async function processDataInChunks() {
+            return new Promise((resolve) => {
+                // Use requestIdleCallback for better performance
+                if (window.requestIdleCallback) {
+                    requestIdleCallback(() => {
+                        initializeAppAfterData();
+                        resolve();
+                    });
+                } else {
+                    setTimeout(() => {
+                        initializeAppAfterData();
+                        resolve();
+                    }, 0);
+                }
+            });
+        }
+
         function initializeAppAfterData() {
-            // Generate filters based on data, then load gallery
             generateDynamicFilters();
             setupFilters();
             updateCollectionStats();
             loadGallery(true);
-            initializeGame(); // set default image or enable game
+            initializeGame();
         }
 
         /* ---------- Navigation ---------- */
@@ -376,13 +501,14 @@
                 });
             });
         }
+        
         function showSection(section) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
             document.getElementById(section + '-section').classList.remove('hidden');
             if (section === 'game') initializeGame();
         }
 
-        /* ---------- Filters & Stats ---------- */
+        /* ---------- Optimized Filters & Stats ---------- */
         function generateDynamicFilters() {
             const availableYears = [...new Set(photoData.map(p => p.year))]
                 .sort((a, b) => parseInt(b) - parseInt(a));
@@ -391,7 +517,9 @@
                 <button class="filter-tab active" data-filter="all">All Photos</button>
                 <button class="filter-tab" data-filter="recent">Recent</button>
             `;
-            const yearButtons = availableYears.map(year => `<button class="filter-tab" data-filter="${year}">${year}</button>`).join('');
+            const yearButtons = availableYears.map(year => 
+                `<button class="filter-tab" data-filter="${year}">${year}</button>`
+            ).join('');
             filterTabsContainer.innerHTML = staticButtons + yearButtons;
         }
 
@@ -408,14 +536,22 @@
         }
 
         function setFilter(filter) {
-            currentFilter = filter; loadedCount = 0;
+            currentFilter = filter; 
+            loadedCount = 0;
+            
             switch(filter) {
-                case 'all': filteredPhotos = [...photoData]; break;
+                case 'all': 
+                    filteredPhotos = [...photoData]; 
+                    break;
                 case 'recent':
-                    const sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-                    filteredPhotos = photoData.filter(p => new Date(p.date) >= sixMonthsAgo); break;
-                default: filteredPhotos = photoData.filter(p => p.year === filter);
+                    const sixMonthsAgo = new Date(); 
+                    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+                    filteredPhotos = photoData.filter(p => new Date(p.date) >= sixMonthsAgo); 
+                    break;
+                default: 
+                    filteredPhotos = photoData.filter(p => p.year === filter);
             }
+            
             filteredPhotos.sort((a,b) => new Date(b.date) - new Date(a.date));
             loadGallery(true);
         }
@@ -423,13 +559,24 @@
         function updateCollectionStats() {
             const totalPhotos = photoData.length;
             const yearsSpan = new Set(photoData.map(p => p.year)).size;
-            document.getElementById('totalPhotosDisplay').textContent = totalPhotos.toLocaleString();
-            document.getElementById('yearsSpanDisplay').textContent = yearsSpan;
-            document.getElementById('showingCountDisplay').textContent = Math.min(loadedCount, filteredPhotos.length);
-            const remaining = Math.max(0, filteredPhotos.length - loadedCount);
-            document.getElementById('remainingCount').textContent = remaining > 0 ? `(${remaining.toLocaleString()} remaining)` : '(All loaded)';
-            const loadMoreSection = document.getElementById('loadMoreSection');
-            if (currentView === 'grid' && remaining > 0) loadMoreSection.classList.remove('hidden'); else loadMoreSection.classList.add('hidden');
+            
+            // Use requestAnimationFrame for smooth updates
+            requestAnimationFrame(() => {
+                document.getElementById('totalPhotosDisplay').textContent = totalPhotos.toLocaleString();
+                document.getElementById('yearsSpanDisplay').textContent = yearsSpan;
+                document.getElementById('showingCountDisplay').textContent = Math.min(loadedCount, filteredPhotos.length);
+                
+                const remaining = Math.max(0, filteredPhotos.length - loadedCount);
+                document.getElementById('remainingCount').textContent = 
+                    remaining > 0 ? `(${remaining.toLocaleString()} remaining)` : '(All loaded)';
+                
+                const loadMoreSection = document.getElementById('loadMoreSection');
+                if (currentView === 'grid' && remaining > 0) {
+                    loadMoreSection.classList.remove('hidden');
+                } else {
+                    loadMoreSection.classList.add('hidden');
+                }
+            });
         }
 
         /* ---------- View toggle ---------- */
@@ -444,79 +591,157 @@
                 });
             });
         }
+        
         function switchView(view) {
             currentView = view;
             const galleryGrid = document.getElementById('galleryGrid');
             const timelineSection = document.getElementById('timelineSection');
             const loadMoreSection = document.getElementById('loadMoreSection');
+            
             if (view === 'timeline') {
-                galleryGrid.style.display = 'none'; loadMoreSection.classList.add('hidden');
-                timelineSection.classList.remove('hidden'); loadTimelineView();
+                galleryGrid.style.display = 'none'; 
+                loadMoreSection.classList.add('hidden');
+                timelineSection.classList.remove('hidden'); 
+                loadTimelineView();
             } else {
-                galleryGrid.style.display = 'grid'; timelineSection.classList.add('hidden');
+                galleryGrid.style.display = 'grid'; 
+                timelineSection.classList.add('hidden');
                 updateCollectionStats();
             }
         }
 
-        /* ---------- Gallery ---------- */
+        /* ---------- Optimized Gallery Loading ---------- */
         function loadGallery(reset = false) {
-            if (reset) { loadedCount = 0; displayedPhotos = []; }
+            if (isLoading) return;
+            
+            if (reset) { 
+                loadedCount = 0; 
+                displayedPhotos = []; 
+            }
+            
             if (filteredPhotos.length === 0 && photoData.length > 0) {
                 filteredPhotos = [...photoData].sort((a, b) => new Date(b.date) - new Date(a.date));
             }
+            
             const grid = document.getElementById('galleryGrid');
             if (photoData.length === 0) {
                 grid.innerHTML = '<div style="text-align:center; padding:40px; color:#666;">No photos yet. Add photoData.json to your repository.</div>';
                 return;
             }
-            showLoadingProgress();
-            setTimeout(() => { loadPhotosChunk(photosPerLoad, reset); }, 50);
+            
+            if (!reset) {
+                showLoadingProgress();
+            }
+            
+            // Use requestIdleCallback for better performance
+            if (window.requestIdleCallback) {
+                requestIdleCallback(() => loadPhotosChunk(photosPerLoad, reset));
+            } else {
+                setTimeout(() => loadPhotosChunk(photosPerLoad, reset), 10);
+            }
         }
 
         function loadPhotosChunk(count, reset = false) {
+            if (isLoading && !reset) return;
+            isLoading = true;
+            
             const startIndex = reset ? 0 : loadedCount;
             const endIndex = Math.min(startIndex + count, filteredPhotos.length);
             const photosToLoad = filteredPhotos.slice(startIndex, endIndex);
-            if (reset) displayedPhotos = photosToLoad; else displayedPhotos = displayedPhotos.concat(photosToLoad);
+            
+            if (reset) {
+                displayedPhotos = photosToLoad;
+            } else {
+                displayedPhotos = displayedPhotos.concat(photosToLoad);
+            }
+            
             loadedCount = displayedPhotos.length;
             const grid = document.getElementById('galleryGrid');
-            if (reset) grid.innerHTML = '';
-            const newPhotosHTML = photosToLoad.map(photo => `
-                <div class="photo-card" onclick="openPhotoModal(${photo.id})">
-                    <img src="${photo.url}" alt="Photo ${photo.id}" loading="lazy">
-                    <div class="photo-info"><div class="photo-date">${photo.month} ${photo.year}</div></div>
-                </div>`).join('');
-            grid.insertAdjacentHTML('beforeend', newPhotosHTML);
-            hideLoadingProgress(); updateCollectionStats();
+            
+            if (reset) {
+                grid.innerHTML = '';
+            }
+            
+            // Create document fragment for better performance
+            const fragment = document.createDocumentFragment();
+            
+            photosToLoad.forEach(photo => {
+                const photoCard = document.createElement('div');
+                photoCard.className = 'photo-card loading';
+                photoCard.onclick = () => openPhotoModal(photo.id);
+                
+                photoCard.innerHTML = `
+                    <img data-src="${photo.url}" alt="Photo ${photo.id}" loading="lazy">
+                    <div class="photo-info">
+                        <div class="photo-date">${photo.month} ${photo.year}</div>
+                    </div>
+                `;
+                
+                fragment.appendChild(photoCard);
+                
+                // Set up intersection observer for lazy loading
+                const img = photoCard.querySelector('img');
+                if (imageObserver) {
+                    imageObserver.observe(img);
+                }
+            });
+            
+            grid.appendChild(fragment);
+            
+            hideLoadingProgress();
+            updateCollectionStats();
+            isLoading = false;
         }
 
-        function loadPhotos(count) { loadPhotosChunk(count); }
-        function loadAllPhotos() { const remaining = filteredPhotos.length - loadedCount; if (remaining > 0) loadPhotosChunk(remaining); }
+        function loadPhotos(count) { 
+            if (!isLoading) {
+                loadPhotosChunk(count); 
+            }
+        }
+        
+        function loadAllPhotos() { 
+            const remaining = filteredPhotos.length - loadedCount; 
+            if (remaining > 0 && !isLoading) {
+                loadPhotosChunk(remaining); 
+            }
+        }
+        
         document.getElementById('loadMoreBtn').addEventListener('click', () => loadPhotos(photosPerLoad));
 
-        /* ---------- Search ---------- */
+        /* ---------- Optimized Search ---------- */
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
-            let searchTimeout;
+            const debouncedSearch = debounce(performSearch, 300);
+            
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase();
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => performSearch(query), 300);
+                debouncedSearch(query);
             });
         }
+        
         function performSearch(query) {
-            if (!query.trim()) { setFilter(currentFilter); return; }
-            const searchResults = photoData.filter(photo =>
-                photo.month.toLowerCase().includes(query) ||
-                photo.year.includes(query) ||
-                (Array.isArray(photo.tags) && photo.tags.some(tag => String(tag).toLowerCase().includes(query))) ||
-                photo.date.includes(query)
-            );
+            if (!query.trim()) { 
+                setFilter(currentFilter); 
+                return; 
+            }
+            
+            // Optimize search performance
+            const searchResults = photoData.filter(photo => {
+                const monthMatch = photo.month.toLowerCase().includes(query);
+                const yearMatch = photo.year.includes(query);
+                const dateMatch = photo.date.includes(query);
+                const tagsMatch = Array.isArray(photo.tags) && 
+                    photo.tags.some(tag => String(tag).toLowerCase().includes(query));
+                
+                return monthMatch || yearMatch || dateMatch || tagsMatch;
+            });
+            
             filteredPhotos = searchResults.sort((a, b) => new Date(b.date) - new Date(a.date));
-            loadedCount = 0; loadGallery(true);
+            loadedCount = 0; 
+            loadGallery(true);
         }
 
-        /* ---------- Timeline ---------- */
+        /* ---------- Timeline (unchanged for space) ---------- */
         function loadTimelineView() {
             const container = document.getElementById('timelineContainer');
             const photosByYear = {};
@@ -539,19 +764,19 @@
                 </div>`).join('');
             container.innerHTML = timelineHTML;
         }
+        
         function toggleTimelineYear(year) {
             const photosDiv = document.getElementById(`timeline-${year}`);
             photosDiv.style.display = photosDiv.style.display === 'none' ? 'grid' : 'none';
         }
 
-        /* ---------- Modal & Game ---------- */
+        /* ---------- Modal & Game (unchanged) ---------- */
         function openPhotoModal(photoId) {
             const photo = photoData.find(p => p.id === photoId);
             if (!photo) return;
             document.getElementById('modalPhoto').src = photo.url;
             document.getElementById('modalTitle').textContent = `Photo ${photo.id}`;
             document.getElementById('modalDate').textContent = `Taken in ${photo.month} ${photo.year}`;
-            // Weibo button toggle
             const weiboBtn = document.getElementById('weiboLinkBtn');
             if (photo.weibo && typeof photo.weibo === 'string' && photo.weibo.trim()) {
                 const w = photo.weibo.trim();
@@ -562,7 +787,10 @@
             }
             document.getElementById('photoModal').classList.remove('hidden');
         }
-        function closeModal() { document.getElementById('photoModal').classList.add('hidden'); }
+        
+        function closeModal() { 
+            document.getElementById('photoModal').classList.add('hidden'); 
+        }
 
         // Game controls
         document.getElementById('startGame').addEventListener('click', startGame);
@@ -578,15 +806,18 @@
                 startBtn.textContent = 'Add Photos First'; startBtn.disabled = true; startBtn.style.opacity = '0.5';
             }
         }
+        
         function startGame() {
             if (photoData.length === 0) { alert('No photos available for the game!'); return; }
             gameActive = true; document.getElementById('startGame').classList.add('hidden');
             document.getElementById('newGame').classList.remove('hidden'); nextQuestion();
         }
+        
         function newGame() {
             if (photoData.length === 0) { alert('No photos available for the game!'); return; }
             gameScore = 0; gameStreak = 0; totalQuestions = 0; updateGameStats(); nextQuestion();
         }
+        
         function nextQuestion() {
             if (photoData.length === 0) { alert('No photos available for the game!'); return; }
             document.getElementById('gameResult').classList.add('hidden');
@@ -595,6 +826,7 @@
             document.getElementById('gamePhoto').src = currentPhoto.url;
             const options = generateOptions(currentPhoto); displayGameOptions(options);
         }
+        
         function generateOptions(correctPhoto) {
             const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
             const years = [...new Set(photoData.map(p => p.year))];
@@ -607,10 +839,14 @@
             }
             return options.sort(() => Math.random() - 0.5);
         }
+        
         function displayGameOptions(options) {
             const optionsContainer = document.getElementById('gameOptions');
-            optionsContainer.innerHTML = options.map(option => `<button class="option-btn" onclick="selectOption('${option}')">${option}</button>`).join('');
+            optionsContainer.innerHTML = options.map(option => 
+                `<button class="option-btn" onclick="selectOption('${option}')">${option}</button>`
+            ).join('');
         }
+        
         function selectOption(selectedOption) {
             const correctAnswer = `${currentPhoto.month} ${currentPhoto.year}`;
             const isCorrect = selectedOption === correctAnswer; totalQuestions++;
@@ -619,10 +855,12 @@
             updateGameStats(); highlightOptions(selectedOption, correctAnswer);
             document.getElementById('nextQuestion').classList.remove('hidden');
         }
+        
         function showGameResult(message, type) {
             const resultDiv = document.getElementById('gameResult');
             resultDiv.textContent = message; resultDiv.className = `game-result ${type}`; resultDiv.classList.remove('hidden');
         }
+        
         function highlightOptions(selectedOption, correctAnswer) {
             const optionBtns = document.querySelectorAll('.option-btn');
             optionBtns.forEach(btn => {
@@ -631,6 +869,7 @@
                 else if (btn.textContent === selectedOption && selectedOption !== correctAnswer) btn.classList.add('incorrect');
             });
         }
+        
         function updateGameStats() {
             document.getElementById('score').textContent = gameScore;
             document.getElementById('streak').textContent = gameStreak;
@@ -638,10 +877,14 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('photoModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+        document.getElementById('photoModal').addEventListener('click', function(e) { 
+            if (e.target === this) closeModal(); 
+        });
+        document.addEventListener('keydown', function(e) { 
+            if (e.key === 'Escape') closeModal(); 
+        });
 
-        /* ---------- Misc ---------- */
+        /* ---------- Misc Functions ---------- */
         function createDefaultGameImage() {
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
                 <defs>
@@ -675,163 +918,156 @@
             return 'data:image/svg+xml,' + encodeURIComponent(svg);
         }
 
+        /* ---------- Optimized Loading Progress ---------- */
         function showLoadingProgress() {
             const progressDiv = document.getElementById('loadingProgress');
             const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
+            
             progressDiv.classList.remove('hidden');
+            
             let progress = 0;
             const interval = setInterval(() => {
-                progress += 10; progressFill.style.width = Math.min(progress, 90) + '%';
+                progress += 15; // Faster progress updates
+                progressFill.style.width = Math.min(progress, 90) + '%';
                 if (progress >= 90) clearInterval(interval);
-            }, 50);
+            }, 30); // Shorter intervals
         }
-        function hideLoadingProgress() { document.getElementById('loadingProgress').classList.add('hidden'); }
+        
+        function hideLoadingProgress() { 
+            document.getElementById('loadingProgress').classList.add('hidden'); 
+        }
+
+        /* ---------- Optimized Back to Top ---------- */
+        (function(){
+            const btn = document.getElementById('back-to-top');
+            if (!btn) return;
+            
+            let ticking = false;
+            
+            function updateBackToTop() {
+                if (window.scrollY > 300) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+                ticking = false;
+            }
+            
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(updateBackToTop);
+                    ticking = true;
+                }
+            });
+            
+            btn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        })();
     </script>
 
-    <!-- Back to Top Button (inserted) -->
-    <div id="back-to-top">↑</div>
+    <!-- Footer (same as original) -->
+    <style>
+        .site-footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 0;
+            margin-top: 50px;
+            text-align: center;
+            padding-bottom: 4px;
+        }
 
+        .site-footer .footer-content:last-child { margin-bottom: 0; }
 
-<script>
+        .footer-content { margin-bottom: 6px; }
+        .footer-link {
+            color: white;
+            text-decoration: underline;
+            font-weight: 700;
+            display: inline-block;
+            padding: 6px 6px;
+            border-radius: 6px;
+            transition: all .2s ease;
+        }
+        .footer-link:hover { opacity: .9; transform: translateY(-1px); }
+        #terms-content {
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin: 12px auto 0;
+            text-align: left;
+            max-width: 700px;
+            margin-top: 6px;
+            padding: 10px 12px; 
+        }
+        #terms-content ul { list-style: disc; padding-left: 20px;  margin: 6px 0 6px; }
+        #terms-content li { margin: 2px 2px; }
+        #terms-toggle {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border-radius: 999px;
+            padding: 8px 12px; 
+            border-radius: 10px;
+            line-height: 1.15; 
+        }
+        #terms-toggle:hover{
+            text-decoration: none;
+            background: rgba(0,0,0,0.06);
+        }
+        .copyright-notice {
+            opacity: .9;
+            margin-top: 0px;
+            font-size: 0.95rem;
+            margin-bottom:12px;
+        }
 
-// Back to Top logic (inserted)
-(function(){
-  var btn = document.getElementById('back-to-top');
-  if (!btn) return;
-  window.addEventListener('scroll', function() {
-    if (window.scrollY > 300) {
-      btn.classList.add('visible');
-    } else {
-      btn.classList.remove('visible');
-    }
-  });
-  btn.addEventListener('click', function() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-})();
+        @media (min-width: 1024px){
+            #gallery-section .view-toggle{ 
+                margin-bottom: 0 !important; 
+                padding-bottom: 6px !important; 
+            }
+            #gallery-section .load-more-section{ 
+                margin-bottom: 4px !important; 
+                padding-bottom: 8px !important; 
+            }
+            #gallery-section .timeline-section{
+                margin-bottom: 0 !important;
+            }
+            .site-footer{ padding-bottom: 4px !important; }
+        }
+    </style>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-content" id="explore-links">
+                <div style="margin-bottom:6px;font-weight:700;">Explore more</div>
+                <a class="footer-link" href="https://canadaxfx.github.io/XZworks/" target="_blank" rel="noopener">Screen Arts of Xiao Zhan</a>
+                <a class="footer-link" href="https://www.youtube.com/@CanadaXFX" target="_blank" rel="noopener">CanadaXFX YouTube Channel</a>
+            </div>
 
-</script>
+            <div class="copyright-notice">&copy; 2025 CanadaXFX. All rights reserved.</div>
 
-<!-- Moved from after </html> by patch -->
-<style>
-  .site-footer {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 8px 0;
-      margin-top: 50px;
-      text-align: center;
-      padding-bottom: 4px;
-  }
-
- .site-footer .footer-content:last-child { margin-bottom: 0; }
-
-  .footer-content { margin-bottom: 6px; }
-  .footer-link {
-      color: white;
-      text-decoration: underline;
-      font-weight: 700;
-      display: inline-block;
-      padding: 6px 6px;
-      border-radius: 6px;
-      transition: all .2s ease;
-  }
-  .footer-link:hover { opacity: .9; transform: translateY(-1px); }
-  #terms-content {
-      background-color: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      margin: 12px auto 0;
-      text-align: left;
-      max-width: 700px;
-      margin-top: 6px;
-      padding: 10px 12px; 
-  }
-  #terms-content ul { list-style: disc; padding-left: 20px;  margin: 6px 0 6px; }
-  #terms-content li { margin: 2px 2px; }
-  #terms-toggle {
-      display: inline-block;
-      background: rgba(255,255,255,0.15);
-      border-radius: 999px;
-      padding: 8px 12px; 
-      border-radius: 10px;
-      line-height: 1.15; 
-  }
-  #terms-toggle:hover{
-    text-decoration: none;
-    background: rgba(0,0,0,0.06);/* optional hover highlight */
-  }
-  .copyright-notice {
-      opacity: .9;
-      margin-top: 0px;
-      font-size: 0.95rem;
-      margin-bottom:12px;
-  }
-
-  .header-cta{
-      display:inline-block;
-      margin-top:6px;
-      font-size:12px;
-      color:#fff;
-      text-decoration: underline;
-      opacity:.95;
-  }
-  .header-cta:hover{ opacity:1; }
-  #explore-links .footer-link{ margin: 4px 6px; }
-
-
-/* === Desktop-only: tighten space above the footer when Gallery is visible === */
-@media (min-width: 1024px){
-  /* The Gallery tab ends with .view-toggle; it was adding extra space */
-  #gallery-section .view-toggle{ 
-    margin-bottom: 0 !important; 
-    padding-bottom: 6px !important; 
-  }
-  /* Keep these blocks snug too */
-  #gallery-section .load-more-section{ 
-    margin-bottom: 4px !important; 
-    padding-bottom: 8px !important; 
-  }
-  #gallery-section .timeline-section{
-    margin-bottom: 0 !important;
-  }
-  /* Footer can stay compact */
-  .site-footer{ padding-bottom: 4px !important; }
-}
-</style>
-<footer class="site-footer">
-  <div class="footer-content">
-
-  <div class="footer-content" id="explore-links">
-    <div style="margin-bottom:6px;font-weight:700;">Explore more</div>
-    <a class="footer-link" href="https://canadaxfx.github.io/XZworks/" target="_blank" rel="noopener">Screen Arts of Xiao Zhan</a>
-    <a class="footer-link" href="https://www.youtube.com/@CanadaXFX" target="_blank" rel="noopener">CanadaXFX YouTube Channel</a>
-  </div>
-
-  <div class="copyright-notice">&copy; 2025 CanadaXFX. All rights reserved.</div>
-
-    <a href="#" id="terms-toggle" class="footer-link">Terms of Use</a>
-    <div id="terms-content" style="display:none;">
-      <ul>
-        <li>All images and content related to Xiao Zhan belong to their respective copyright owners..</li>
-	<li>All content on this site is curated and organized © 2025 CanadaXFX.</li>
-        <li>AI training is strictly prohibited.</li>
-        <li>The original content, design, and code of this website may not be reproduced, distributed, or used without explicit permission.</li>
-        <li>Personal and non-commercial use only.</li>
-      </ul>
-    </div>
-  </div>
-  
-
-</footer>
-<script>
-  (function(){
-    var t=document.getElementById('terms-toggle');
-    if(t) t.addEventListener('click', function(e){
-      e.preventDefault();
-      var c=document.getElementById('terms-content');
-      if(c) c.style.display = (c.style.display==='none'||!c.style.display)?'block':'none';
-    });
-  })();
-</script>
+            <a href="#" id="terms-toggle" class="footer-link">Terms of Use</a>
+            <div id="terms-content" style="display:none;">
+                <ul>
+                    <li>All images and content related to Xiao Zhan belong to their respective copyright owners.</li>
+                    <li>All content on this site is curated and organized © 2025 CanadaXFX.</li>
+                    <li>AI training is strictly prohibited.</li>
+                    <li>The original content, design, and code of this website may not be reproduced, distributed, or used without explicit permission.</li>
+                    <li>Personal and non-commercial use only.</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        (function(){
+            var t=document.getElementById('terms-toggle');
+            if(t) t.addEventListener('click', function(e){
+                e.preventDefault();
+                var c=document.getElementById('terms-content');
+                if(c) c.style.display = (c.style.display==='none'||!c.style.display)?'block':'none';
+            });
+        })();
+    </script>
 </body>
 </html>
