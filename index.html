@@ -816,6 +816,40 @@
             } else {
                 yearElement.classList.add('expanded');
                 expandedYears.add(year);
+                
+                // Reset to initial photo count when expanding (performance improvement)
+                const initialCount = calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
+                yearPhotoDisplayCount[year] = initialCount;
+                
+                // Rebuild the year content with only initial photos
+                const yearPhotos = photoData.filter(p => p.year === year);
+                const photosGrid = document.getElementById(`photos-${year}`);
+                const displayPhotos = yearPhotos.slice(0, initialCount);
+                const hasMore = yearPhotos.length > initialCount;
+                
+                // Update photos grid
+                photosGrid.innerHTML = generatePhotosHTML(displayPhotos);
+                
+                // Update or create "Show More" button
+                let showMoreBtn = photosGrid.parentElement.querySelector('.show-more-btn');
+                if (hasMore) {
+                    const remaining = yearPhotos.length - initialCount;
+                    const remainingRows = Math.ceil(remaining / calculatePhotosPerRow());
+                    
+                    if (showMoreBtn) {
+                        showMoreBtn.textContent = `Show More Photos (${remainingRows} more rows, ${remaining} remaining)`;
+                        showMoreBtn.style.display = 'block';
+                    } else {
+                        photosGrid.insertAdjacentHTML('afterend', `
+                            <button class="show-more-btn" onclick="loadMorePhotosForYear('${year}')">
+                                Show More Photos (${remainingRows} more rows, ${remaining} remaining)
+                            </button>
+                        `);
+                    }
+                } else if (showMoreBtn) {
+                    showMoreBtn.style.display = 'none';
+                }
+                
                 // Setup lazy loading for this year
                 setupLazyLoadingForYear(year);
             }
