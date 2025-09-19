@@ -607,6 +607,31 @@
             loadPhotoData();
         });
 
+        /* ---------- IMGUR THUMBNAIL GENERATION ---------- */
+        function generateImgurThumbnail(originalUrl, size = 'm') {
+            /*
+            Imgur thumbnail sizes:
+            's' = small square (90x90)
+            'b' = big square (160x160) 
+            't' = small thumbnail (160x160)
+            'm' = medium thumbnail (320x320) - RECOMMENDED
+            'l' = large thumbnail (640x640)
+            'h' = huge thumbnail (1024x1024)
+            */
+            
+            // Extract the image ID and extension from Imgur URL
+            const match = originalUrl.match(/https:\/\/i\.imgur\.com\/([^.]+)\.(\w+)/);
+            
+            if (match) {
+                const [, imageId, extension] = match;
+                return `https://i.imgur.com/${imageId}${size}.${extension}`;
+            }
+            
+            // Fallback to original URL if pattern doesn't match
+            console.warn('Could not parse Imgur URL for thumbnail:', originalUrl);
+            return originalUrl;
+        }
+
         /* ---------- Data Loading ---------- */
         async function loadPhotoData() {
             try {
@@ -680,13 +705,14 @@
                 const displayCount = yearPhotoDisplayCount[year] || PHOTOS_PER_YEAR_INITIAL;
                 const hasMore = photos.length > displayCount;
                 
-                // Create preview thumbnails for collapsed state
+                // Create preview thumbnails for collapsed state (using Imgur thumbnails)
                 const previewPhotos = photos.slice(0, 4);
                 const previewHTML = `
                     <div class="year-preview">
-                        ${previewPhotos.map(photo => `
-                            <img src="${photo.url}" alt="Preview" class="preview-thumb">
-                        `).join('')}
+                        ${previewPhotos.map(photo => {
+                            const thumbnailUrl = generateImgurThumbnail(photo.url, 's'); // Small 90x90 for preview
+                            return `<img src="${thumbnailUrl}" alt="Preview" class="preview-thumb">`;
+                        }).join('')}
                         ${photos.length > 4 ? `<div class="preview-more">+${photos.length - 4}</div>` : ''}
                     </div>
                 `;
@@ -723,16 +749,24 @@
             setupLazyLoading();
         }
 
-        /* ---------- Photo HTML Generation ---------- */
+        /* ---------- Photo HTML Generation with Thumbnails ---------- */
         function generatePhotosHTML(photos) {
-            return photos.map(photo => `
-                <div class="timeline-photo" onclick="openPhotoModal(${photo.id})">
-                    <img data-src="${photo.url}" alt="Photo ${photo.id}" class="lazy-image">
-                    <div class="photo-overlay">
-                        ${photo.month} ${photo.year}
+            return photos.map(photo => {
+                // Generate thumbnail URL for grid display
+                const thumbnailUrl = generateImgurThumbnail(photo.url, 'm'); // Medium 320x320 for grid
+                
+                return `
+                    <div class="timeline-photo" onclick="openPhotoModal(${photo.id})">
+                        <img data-src="${thumbnailUrl}" 
+                             data-fullsize="${photo.url}"
+                             alt="Photo ${photo.id}" 
+                             class="lazy-image">
+                        <div class="photo-overlay">
+                            ${photo.month} ${photo.year}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         /* ---------- Year Toggle Functionality ---------- */
@@ -796,8 +830,13 @@
                                 img.removeAttribute('data-src');
                             };
                             img.onerror = () => {
-                                img.alt = 'Failed to load';
-                                img.classList.remove('loading-placeholder');
+                                // If thumbnail fails, try full-size image
+                                if (img.dataset.fullsize && img.dataset.fullsize !== img.dataset.src) {
+                                    img.src = img.dataset.fullsize;
+                                } else {
+                                    img.alt = 'Failed to load';
+                                    img.classList.remove('loading-placeholder');
+                                }
                             };
                         }
                         imageObserver.unobserve(img);
@@ -926,6 +965,7 @@
             const photo = photoData.find(p => p.id === photoId);
             if (!photo) return;
             
+            // Always use full-size image in modal
             document.getElementById('modalPhoto').src = photo.url;
             document.getElementById('modalTitle').textContent = `Photo ${photo.id}`;
             document.getElementById('modalDate').textContent = `Taken in ${photo.month} ${photo.year}`;
@@ -1003,6 +1043,7 @@
             document.getElementById('gameResult').classList.add('hidden');
             document.getElementById('nextQuestion').classList.add('hidden');
             currentPhoto = photoData[Math.floor(Math.random() * photoData.length)];
+            // Use full-size image for game
             document.getElementById('gamePhoto').src = currentPhoto.url;
             const options = generateOptions(currentPhoto); 
             displayGameOptions(options);
