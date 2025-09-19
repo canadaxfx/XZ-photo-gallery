@@ -594,8 +594,34 @@
         let gameScore = 0, gameStreak = 0, totalQuestions = 0, currentPhoto = null, gameActive = false;
         let expandedYears = new Set();
         let yearPhotoDisplayCount = {}; // Track how many photos are shown per year
-        const PHOTOS_PER_YEAR_INITIAL = 12; // Show 12 photos initially per year
-        const PHOTOS_PER_LOAD = 20; // Load 20 more when "Show More" is clicked
+        
+        /* ---------- ROW-BASED DISPLAY CONFIGURATION ---------- */
+        const ROWS_PER_YEAR_INITIAL = 2; // Show 2 rows initially per year
+        const ROWS_PER_LOAD = 10; // Load 2 more rows when "Show More" is clicked
+        
+        // Function to calculate photos per row based on screen width
+        function calculatePhotosPerRow() {
+            const screenWidth = window.innerWidth;
+            
+            if (screenWidth <= 768) {
+                return 3; // Mobile: 3 photos per row (matches CSS media query)
+            } else {
+                // Desktop/tablet: calculate based on available width
+                const containerWidth = Math.min(1000, screenWidth - 40); // max-width: 1000px, padding: 20px
+                const gridWidth = containerWidth - 40; // grid padding: 20px each side
+                const photoWidth = 120; // minmax(120px, 1fr)
+                const gap = 12;
+                
+                const photosPerRow = Math.floor((gridWidth + gap) / (photoWidth + gap));
+                return Math.max(3, Math.min(8, photosPerRow)); // Between 3-8 photos per row
+            }
+        }
+        
+        // Function to convert rows to photo count
+        function calculatePhotosFromRows(rows) {
+            const photosPerRow = calculatePhotosPerRow();
+            return rows * photosPerRow;
+        }
         
         // Intersection Observer for lazy loading
         let imageObserver = null;
@@ -605,6 +631,8 @@
             setupSearch();
             setupIntersectionObserver();
             loadPhotoData();
+            
+            console.log(`Initial screen: ${window.innerWidth}px, Photos per row: ${calculatePhotosPerRow()}, Initial photos: ${calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL)}`);
         });
 
         /* ---------- IMGUR THUMBNAIL GENERATION ---------- */
@@ -672,7 +700,8 @@
             photoData.forEach(photo => {
                 if (!photosByYear[photo.year]) {
                     photosByYear[photo.year] = [];
-                    yearPhotoDisplayCount[photo.year] = PHOTOS_PER_YEAR_INITIAL;
+                    // Use row-based calculation for initial display count
+                    yearPhotoDisplayCount[photo.year] = calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
                 }
                 photosByYear[photo.year].push(photo);
             });
@@ -702,8 +731,13 @@
             
             const timelineHTML = sortedYears.map(year => {
                 const photos = photosByYear[year];
-                const displayCount = yearPhotoDisplayCount[year] || PHOTOS_PER_YEAR_INITIAL;
+                const displayCount = yearPhotoDisplayCount[year] || calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
                 const hasMore = photos.length > displayCount;
+                
+                // Calculate row information for display
+                const photosPerRow = calculatePhotosPerRow();
+                const displayingRows = Math.ceil(displayCount / photosPerRow);
+                const totalRows = Math.ceil(photos.length / photosPerRow);
                 
                 // Create preview thumbnails for collapsed state (using Imgur thumbnails)
                 const previewPhotos = photos.slice(0, 4);
@@ -724,7 +758,7 @@
                                 <div class="year-header-top">
                                     <span class="year-title">${year}</span>
                                     <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="timeline-year-count">${photos.length} photos</span>
+                                        <span class="timeline-year-count">${photos.length} photos (${totalRows} rows)</span>
                                         <span class="expand-icon">▼</span>
                                     </div>
                                 </div>
@@ -737,7 +771,7 @@
                             </div>
                             ${hasMore ? `
                                 <button class="show-more-btn" onclick="loadMorePhotosForYear('${year}')">
-                                    Show More Photos (${photos.length - displayCount} remaining)
+                                    Show More Photos (${Math.ceil((photos.length - displayCount) / photosPerRow)} more rows, ${photos.length - displayCount} remaining)
                                 </button>
                             ` : ''}
                         </div>
@@ -789,11 +823,14 @@
             updateStats();
         }
 
-        /* ---------- Load More Photos for Year ---------- */
+        /* ---------- Load More Photos for Year (Row-Based) ---------- */
         function loadMorePhotosForYear(year) {
             const yearPhotos = photoData.filter(p => p.year === year);
             const currentDisplayCount = yearPhotoDisplayCount[year];
-            const newDisplayCount = Math.min(currentDisplayCount + PHOTOS_PER_LOAD, yearPhotos.length);
+            
+            // Calculate how many more photos to load based on rows
+            const additionalPhotos = calculatePhotosFromRows(ROWS_PER_LOAD);
+            const newDisplayCount = Math.min(currentDisplayCount + additionalPhotos, yearPhotos.length);
             
             yearPhotoDisplayCount[year] = newDisplayCount;
             
@@ -810,7 +847,8 @@
                 if (showMoreBtn) showMoreBtn.remove();
             } else {
                 const remaining = yearPhotos.length - newDisplayCount;
-                showMoreBtn.textContent = `Show More Photos (${remaining} remaining)`;
+                const remainingRows = Math.ceil(remaining / calculatePhotosPerRow());
+                showMoreBtn.textContent = `Show More Photos (${remainingRows} more rows, ${remaining} remaining)`;
             }
             
             // Setup lazy loading for new images
@@ -877,6 +915,29 @@
                 }
             });
         }
+
+        /* ---------- Window Resize Handling ---------- */
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const newPhotosPerRow = calculatePhotosPerRow();
+                console.log(`Window resized. New photos per row: ${newPhotosPerRow}`);
+                
+                // Update button text to reflect new row calculations
+                document.querySelectorAll('.show-more-btn').forEach(btn => {
+                    const yearMatch = btn.getAttribute('onclick').match(/loadMorePhotosForYear\('(\d+)'\)/);
+                    if (yearMatch) {
+                        const year = yearMatch[1];
+                        const yearPhotos = photoData.filter(p => p.year === year);
+                        const currentDisplayCount = yearPhotoDisplayCount[year];
+                        const remaining = yearPhotos.length - currentDisplayCount;
+                        const remainingRows = Math.ceil(remaining / newPhotosPerRow);
+                        btn.textContent = `Show More Photos (${remainingRows} more rows, ${remaining} remaining)`;
+                    }
+                });
+            }, 250);
+        });
 
         /* ---------- Search Functionality ---------- */
         function setupSearch() {
@@ -1149,6 +1210,28 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         })();
+
+        /* ---------- Debug Function ---------- */
+        function debugRowCalculations() {
+            const photosPerRow = calculatePhotosPerRow();
+            const initialPhotos = calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
+            const loadMorePhotos = calculatePhotosFromRows(ROWS_PER_LOAD);
+            
+            console.log('=== ROW-BASED DISPLAY DEBUG ===');
+            console.log(`Screen width: ${window.innerWidth}px`);
+            console.log(`Photos per row: ${photosPerRow}`);
+            console.log(`Initial rows: ${ROWS_PER_YEAR_INITIAL} = ${initialPhotos} photos`);
+            console.log(`Load more rows: ${ROWS_PER_LOAD} = ${loadMorePhotos} photos`);
+            
+            alert(`ROW-BASED DISPLAY INFO:
+            
+Screen: ${window.innerWidth}px wide
+Photos per row: ${photosPerRow}
+Initial: ${ROWS_PER_YEAR_INITIAL} rows = ${initialPhotos} photos
+Load more: ${ROWS_PER_LOAD} rows = ${loadMorePhotos} photos
+
+Check console for detailed logs.`);
+        }
     </script>
 
     <!-- Footer -->
