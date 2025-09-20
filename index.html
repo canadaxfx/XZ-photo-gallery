@@ -333,10 +333,10 @@
         <!-- Game Section -->
         <div id="game-section" class="content-section hidden">
             <div class="game-container">
-                <h2 class="section-title">When Was This Photo Taken?</h2>
+                <h2 class="section-title">When Was This Photo Posted?</h2>
                 <p style="font-size:13px; color:#1565C0;">Click "Start Game" to begin!</p>
                 <div style="background:#e8f4ff; padding:15px; border-radius:10px; margin:20px auto; max-width:500px; border-left:4px solid #2196F3;">
-                    <p style="margin:0; font-size:12px; color:#1565C0;"><strong>💡 猜猜看:</strong> 相框里的照片是什么时候照的？<br>点击"开始游戏！"，测试你的眼力吧！</p>
+                    <p style="margin:0; font-size:12px; color:#1565C0;"><strong>💡 猜猜看:</strong> 这张照片在什么时候发布？<br>点击"开始游戏！"，测试你的眼力吧！</p>
                 </div>
                 <div class="game-stats">
                     <div class="stat">Score: <span id="score">0</span></div>
@@ -781,7 +781,7 @@
             };
             
             document.getElementById('modalTitle').textContent = `Photo ${photo.id}`;
-            document.getElementById('modalDate').textContent = `Taken in ${photo.month} ${photo.year}`;
+            document.getElementById('modalDate').textContent = `Posted in ${photo.month} ${photo.year}`;
             
             window.currentPhotoForDownload = photo;
             
