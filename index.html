@@ -466,6 +466,7 @@
             setupSearch();
             setupIntersectionObserver();
             setupBackToTop();
+            setupFooterToggle(); // Added this function call
             loadPhotoData();
         });
 
@@ -1049,6 +1050,20 @@ function generatePhotosHTML(photos) {
             });
         }
 
+        /* ---------- Footer Toggle (FIXED) ---------- */
+        function setupFooterToggle() {
+            const termsToggle = document.getElementById('terms-toggle');
+            if (termsToggle) {
+                termsToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const termsContent = document.getElementById('terms-content');
+                    if (termsContent) {
+                        termsContent.style.display = (termsContent.style.display === 'none' || !termsContent.style.display) ? 'block' : 'none';
+                    }
+                });
+            }
+        }
+
         /* ---------- Window Resize Handling ---------- */
         let resizeTimeout;
         window.addEventListener('resize', function() {
@@ -1067,15 +1082,6 @@ function generatePhotosHTML(photos) {
                     }
                 });
             }, 250);
-        });
-
-        /* ---------- Footer Toggle ---------- */
-        document.getElementById('terms-toggle').addEventListener('click', function(e){
-            e.preventDefault();
-            const termsContent = document.getElementById('terms-content');
-            if(termsContent) {
-                termsContent.style.display = (termsContent.style.display === 'none' || !termsContent.style.display) ? 'block' : 'none';
-            }
         });
     </script>
 
