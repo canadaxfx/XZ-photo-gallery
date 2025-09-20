@@ -576,18 +576,17 @@
             setupLazyLoading();
         }
 
-        function generatePhotosHTML(photos) {
-            return photos.map(photo => {
-                const thumbnailUrl = generateImgurThumbnail(photo.url, 'm');
-                return `
-                    <div class="timeline-photo" onclick="openPhotoModal(${photo.id})">
-                        <img data-src="${thumbnailUrl}" data-fullsize="${photo.url}" alt="Photo ${photo.id}" class="lazy-image">
-                        <div class="photo-overlay">${photo.month} ${photo.year}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
+function generatePhotosHTML(photos) {
+    return photos.map(photo => {
+        const thumbnailUrl = generateImgurThumbnail(photo.url, 'm');
+        return `
+            <div class="timeline-photo" onclick="openPhotoModal(${photo.id})">
+                <img data-src="${thumbnailUrl}" data-fullsize="${photo.url}" alt="Photo ${photo.id}" class="lazy-image">
+                <div class="photo-overlay">${photo.date}</div>
+            </div>
+        `;
+    }).join('');
+}
         function toggleYear(year) {
             const yearElement = document.querySelector(`[data-year="${year}"]`);
             const isExpanded = yearElement.classList.contains('expanded');
