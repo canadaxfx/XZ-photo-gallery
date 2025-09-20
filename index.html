@@ -312,6 +312,8 @@
             #back-to-top { bottom: 80px; right: 15px; width: 45px; height: 45px; line-height: 43px; font-size: 18px; }
             .search-results-header h3 { font-size: 1.2rem; }
             .clear-search-btn { padding: 10px 20px; font-size: 13px; }
+            .game-stats {flex-wrap: nowrap; gap: 8px; margin: 15px 0; }
+	    .stat { padding: 10px 12px; font-size: 12px; border-radius: 10px; flex: 1; text-align: center; min-width: 0; /* Allow shrinking */}
         }
 
         /* Footer Styles */
@@ -437,15 +439,31 @@
         const ROWS_PER_LOAD = 10;
         
         /* ---------- Utility Functions ---------- */
-        function calculatePhotosPerRow() {
-            const screenWidth = window.innerWidth;
-            if (screenWidth <= 768) return 3;
-            const containerWidth = Math.min(1000, screenWidth - 40);
-            const gridWidth = containerWidth - 40;
-            const photosPerRow = Math.floor((gridWidth + 12) / (120 + 12));
-            return Math.max(3, Math.min(8, photosPerRow));
-        }
-        
+function calculatePhotosPerRow() {
+    const screenWidth = window.innerWidth;
+    
+    // Mobile breakpoint
+    if (screenWidth <= 768) return 3;
+    
+    // For all larger screens (including iPad Pro), calculate based on 
+    // actual container constraints, not screen width
+    const maxContainerWidth = 1000;  // Your CSS max-width
+    const containerPadding = 40;     // 20px on each side
+    const availableWidth = maxContainerWidth - containerPadding; // 960px
+    const gap = 12;
+    const minPhotoWidth = 120;       // From your CSS minmax(120px, 1fr)
+    
+    // Mathematical solution: find max n where each photo >= 120px
+    // Formula: (availableWidth - (n-1) * gap) / n >= minPhotoWidth
+    // Solving: n <= (availableWidth + gap) / (minPhotoWidth + gap)
+    const maxPhotosPerRow = Math.floor((availableWidth + gap) / (minPhotoWidth + gap));
+    
+    // Result: (960 + 12) / (120 + 12) = 972 / 132 = 7.36... so max 7
+    return Math.min(maxPhotosPerRow, 7); // This will always be 7 for screens > 768px
+} 
+
+
+      
         function calculatePhotosFromRows(rows) {
             return rows * calculatePhotosPerRow();
         }
@@ -466,7 +484,7 @@
             setupSearch();
             setupIntersectionObserver();
             setupBackToTop();
-            setupFooterToggle(); // Added this function call
+            setupFooterToggle(); // Add this line
             loadPhotoData();
         });
 
@@ -1050,7 +1068,7 @@ function generatePhotosHTML(photos) {
             });
         }
 
-        /* ---------- Footer Toggle (FIXED) ---------- */
+        /* ---------- Footer Toggle Function ---------- */
         function setupFooterToggle() {
             const termsToggle = document.getElementById('terms-toggle');
             if (termsToggle) {
@@ -1058,7 +1076,18 @@ function generatePhotosHTML(photos) {
                     e.preventDefault();
                     const termsContent = document.getElementById('terms-content');
                     if (termsContent) {
-                        termsContent.style.display = (termsContent.style.display === 'none' || !termsContent.style.display) ? 'block' : 'none';
+                        const isCurrentlyHidden = termsContent.style.display === 'none' || !termsContent.style.display;
+                        termsContent.style.display = isCurrentlyHidden ? 'block' : 'none';
+                        
+                        // If we're showing the terms, scroll to them smoothly
+                        if (isCurrentlyHidden) {
+                            setTimeout(() => {
+                                termsContent.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'start' 
+                                });
+                            }, 100); // Small delay to ensure the content is rendered
+                        }
                     }
                 });
             }
