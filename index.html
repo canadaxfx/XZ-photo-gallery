@@ -489,24 +489,58 @@ function calculatePhotosPerRow() {
         });
 
         /* ---------- Data Loading ---------- */
-        async function loadPhotoData() {
+// Replace ONLY the loadPhotoData function in your index.html
+async function loadPhotoData() {
+    try {
+        // Try new multi-year system first
+        const years = [2025, 2024, 2023]; // Add years as needed
+        let allPhotos = [];
+        
+        for (const year of years) {
             try {
-                const res = await fetch(`photoData.json?v=${Date.now()}`, { cache: 'no-store' });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                if (!Array.isArray(data)) throw new Error('JSON is not an array');
-                
-                photoData = data;
-                initializeTimeline();
+                const res = await fetch(`${year}.json?v=${Date.now()}`, { cache: 'no-store' });
+                if (res.ok) {
+                    const yearData = await res.json();
+                    if (Array.isArray(yearData)) {
+                        allPhotos.push(...yearData);
+                    }
+                }
             } catch (err) {
-                console.error('Failed to load photoData.json:', err);
-                document.getElementById('timelineContainer').innerHTML = `
-                    <div class="timeline-empty">
-                        <h3>Could not load photo data</h3>
-                        <p>Please check your connection and refresh the page.</p>
-                    </div>`;
+                console.log(`No ${year}.json found, skipping`);
             }
         }
+        
+        // Fallback to old system if no year files found
+        if (allPhotos.length === 0) {
+            console.log('No year files found, trying photoData.json...');
+            const res = await fetch(`photoData.json?v=${Date.now()}`, { cache: 'no-store' });
+            if (res.ok) {
+                allPhotos = await res.json();
+            }
+        }
+        
+        if (!Array.isArray(allPhotos) || allPhotos.length === 0) {
+            throw new Error('No valid photo data found');
+        }
+        
+        // Sort by date and assign IDs
+        allPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+        allPhotos.forEach((photo, index) => {
+            photo.id = index + 1;
+        });
+        
+        photoData = allPhotos;
+        initializeTimeline();
+        
+    } catch (err) {
+        console.error('Failed to load photo data:', err);
+        document.getElementById('timelineContainer').innerHTML = `
+            <div class="timeline-empty">
+                <h3>Could not load photo data</h3>
+                <p>Please check your connection and refresh the page.</p>
+            </div>`;
+    }
+}
 
         /* ---------- Timeline Functions ---------- */
         function initializeTimeline() {
