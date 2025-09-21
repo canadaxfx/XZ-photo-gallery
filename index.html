@@ -901,47 +901,91 @@ function generatePhotosHTML(photos) {
             document.getElementById('photoModal').classList.add('hidden'); 
         }
 
-        async function downloadPhoto() {
-            if (!window.currentPhotoForDownload) return;
-            
-            const photo = window.currentPhotoForDownload;
-            const downloadBtn = document.getElementById('downloadBtn');
-            
+async function downloadPhoto() {
+    if (!window.currentPhotoForDownload) return;
+    
+    const photo = window.currentPhotoForDownload;
+    const downloadBtn = document.getElementById('downloadBtn');
+    
+    try {
+        downloadBtn.textContent = 'Downloading...';
+        downloadBtn.disabled = true;
+        
+        const response = await fetch(photo.url);
+        const blob = await response.blob();
+        
+        // Get file extension
+        const fileExtension = photo.url.split('.').pop().split('?')[0] || 'jpg';
+        const suggestedName = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${fileExtension}`;
+        
+        // Try File System Access API first (Chrome/Edge)
+        if (window.showSaveFilePicker) {
             try {
-                downloadBtn.textContent = 'Downloading...';
-                downloadBtn.disabled = true;
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: suggestedName,
+                    types: [{
+                        description: 'Image Files',
+                        accept: {
+                            'image/jpeg': ['.jpg', '.jpeg'],
+                            'image/png': ['.png'],
+                            'image/gif': ['.gif'],
+                            'image/webp': ['.webp']
+                        }
+                    }]
+                });
                 
-                const response = await fetch(photo.url);
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
                 
-                const fileExtension = photo.url.split('.').pop().split('?')[0] || 'jpg';
-                a.download = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${fileExtension}`;
-                
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                
-                downloadBtn.textContent = 'Downloaded!';
+                downloadBtn.textContent = 'Downloaded to chosen folder!';
                 setTimeout(() => {
                     downloadBtn.textContent = 'Download High-Res';
                     downloadBtn.disabled = false;
                 }, 2000);
                 
-            } catch (error) {
-                console.error('Download failed:', error);
-                window.open(photo.url, '_blank');
-                
-                downloadBtn.textContent = 'Error - Opened in new tab';
-                setTimeout(() => {
-                    downloadBtn.textContent = 'Download High-Res';
-                    downloadBtn.disabled = false;
-                }, 3000);
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    downloadBtn.textContent = 'Download cancelled';
+                } else {
+                    throw err; // Fall back to standard download
+                }
             }
+        } else {
+            // Fallback for Safari/Firefox/older browsers
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = suggestedName;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            downloadBtn.textContent = 'Downloaded! (Chrome/Edge allow folder choice)';
         }
+        
+        setTimeout(() => {
+            downloadBtn.textContent = 'Download High-Res';
+            downloadBtn.disabled = false;
+        }, 3000);
+        
+    } catch (error) {
+        console.error('Download failed:', error);
+        
+        // Final fallback - open in new tab
+        window.open(photo.url, '_blank');
+        
+        downloadBtn.textContent = 'Error - Opened in new tab';
+        setTimeout(() => {
+            downloadBtn.textContent = 'Download High-Res';
+            downloadBtn.disabled = false;
+        }, 3000);
+    }
+}
+
+
 
         /* ---------- Modal Event Listeners ---------- */
         document.getElementById('photoModal').addEventListener('click', function(e) { 
