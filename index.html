@@ -392,11 +392,11 @@
                     <img id="gamePhoto" class="game-photo" alt="Guess the date">
                     <div id="gameOptions" class="options"></div>
                     <div id="gameResult" class="game-result hidden"></div>
-                    <button id="nextQuestion" class="btn primary hidden">Next Question</button>
+                    <button id="nextQuestion" class="btn primary hidden">Next Question 下一题</button>
                 </div>
                 <div class="game-controls">
                     <button id="startGame" class="btn primary">Start Game 开始游戏！</button>
-                    <button id="newGame" class="btn primary hidden">New Game</button>
+                    <button id="newGame" class="btn primary hidden">New Game 重新开始</button>
                 </div>
             </div>
         </div>
@@ -969,18 +969,22 @@ function generatePhotosHTML(photos) {
             displayGameOptions(generateOptions(currentPhoto));
         }
         
-        function generateOptions(correctPhoto) {
-            const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-            const years = [...new Set(photoData.map(p => p.year))];
-            const options = [`${correctPhoto.month} ${correctPhoto.year}`];
-            while (options.length < 4) {
-                const randomMonth = months[Math.floor(Math.random()*months.length)];
-                const randomYear = years[Math.floor(Math.random()*years.length)] || correctPhoto.year;
-                const option = `${randomMonth} ${randomYear}`;
-                if (!options.includes(option)) options.push(option);
-            }
-            return options.sort(() => Math.random() - 0.5);
-        }
+function generateOptions(correctPhoto) {
+    const dateParts = correctPhoto.date.split('-');
+    const correctOption = `${dateParts[0]}-${dateParts[1]}`; // Gets "2025-08"
+    
+    const options = [correctOption];
+    const years = [...new Set(photoData.map(p => p.year))];
+    
+    while (options.length < 4) {
+        const randomYear = years[Math.floor(Math.random() * years.length)] || correctPhoto.year;
+        const randomMonth = Math.floor(Math.random() * 12) + 1;
+        const option = `${randomYear}-${randomMonth.toString().padStart(2, '0')}`;
+        if (!options.includes(option)) options.push(option);
+    }
+    return options.sort(() => Math.random() - 0.5);
+}
+
         
         function displayGameOptions(options) {
             document.getElementById('gameOptions').innerHTML = options.map(option => 
@@ -988,22 +992,24 @@ function generatePhotosHTML(photos) {
             ).join('');
         }
         
-        function selectOption(selectedOption) {
-            const correctAnswer = `${currentPhoto.month} ${currentPhoto.year}`;
-            const isCorrect = selectedOption === correctAnswer; 
-            totalQuestions++;
-            if (isCorrect) { 
-                gameScore++; 
-                gameStreak++; 
-                showGameResult('Correct!', 'correct'); 
-            } else { 
-                gameStreak = 0; 
-                showGameResult(`Wrong! It was ${correctAnswer}`, 'incorrect'); 
-            }
-            updateGameStats(); 
-            highlightOptions(selectedOption, correctAnswer);
-            document.getElementById('nextQuestion').classList.remove('hidden');
-        }
+function selectOption(selectedOption) {
+    const dateParts = currentPhoto.date.split('-');
+    const correctAnswer = `${dateParts[0]}-${dateParts[1]}`; // Gets "2025-08"
+    
+    const isCorrect = selectedOption === correctAnswer; 
+    totalQuestions++;
+    if (isCorrect) { 
+        gameScore++; 
+        gameStreak++; 
+        showGameResult('Correct! 正确!', 'correct'); 
+    } else { 
+        gameStreak = 0; 
+        showGameResult(`Wrong! It was ${correctAnswer}`, 'incorrect'); 
+    }
+    updateGameStats(); 
+    highlightOptions(selectedOption, correctAnswer);
+    document.getElementById('nextQuestion').classList.remove('hidden');
+}
         
         function showGameResult(message, type) {
             const resultDiv = document.getElementById('gameResult');
