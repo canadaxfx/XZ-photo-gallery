@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Copyright and AI training protection -->
     <meta name="robots" content="noai, noimageai">
     <meta name="copyright" content="Content curation and organization © 2025 CanadaXFX. Unauthorized AI training prohibited.">
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QP979YZW73"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QP979YZW73"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -140,14 +138,77 @@
             padding: 10px 8px 6px; font-size: 11px; font-weight: 600; text-align: center;
         }
         
-        /* Buttons */
-        .show-more-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none;
-            padding: 12px 25px; border-radius: 20px; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease; display: block; margin: 15px auto 0;
+        /* Pagination Styles */
+        .year-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            padding: 0 5px;
         }
-        .show-more-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3); }
-        .show-more-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .year-controls label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+        .year-controls select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .pagination-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .pagination-nav .btn {
+            min-width: 40px;
+            padding: 10px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.2);
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        .pagination-nav .btn:hover {
+            background: #e9eafc;
+            transform: translateY(-2px);
+        }
+        .pagination-nav .btn.primary, .pagination-nav .btn[disabled] {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: none;
+            cursor: default;
+            border: none;
+            opacity: 1;
+        }
+        .pagination-nav span {
+            color: #555;
+            padding: 0 5px;
+            font-weight: 600;
+        }
+
+        /* Jump to Page Styles */
+        .jump-to-page { display: flex; align-items: center; gap: 5px; margin-left: 15px; }
+        .jump-to-page input {
+            width: 70px;
+            padding: 9px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 13px;
+        }
+        .jump-to-page input::-webkit-outer-spin-button,
+        .jump-to-page input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        .jump-to-page input[type=number] { -moz-appearance: textfield; }
         
         /* Loading States */
         .loading-placeholder {
@@ -348,7 +409,6 @@
             <button class="nav-btn" data-section="game">Time Game<br>时间游戏</button>
         </nav>
 
-        <!-- Gallery Section -->
         <div id="gallery-section" class="content-section">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -375,7 +435,6 @@
             </div>
         </div>
 
-        <!-- Game Section -->
         <div id="game-section" class="content-section hidden">
             <div class="game-container">
                 <h2 class="section-title">When Was This Photo Posted?</h2>
@@ -402,7 +461,6 @@
         </div>
     </div>
 
-    <!-- Photo Modal -->
     <div id="photoModal" class="modal hidden">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal()">&times;</button>
@@ -421,7 +479,6 @@
         </div>
     </div>
 
-    <!-- Back to Top Button -->
     <div id="back-to-top">
         <div class="arrow">▲</div>
         <div class="text">TOP<br>回顶部</div>
@@ -431,43 +488,21 @@
         let photoData = [];
         let gameScore = 0, gameStreak = 0, totalQuestions = 0, currentPhoto = null, gameActive = false;
         let expandedYears = new Set();
-        let yearPhotoDisplayCount = {};
+        let yearPaginationSettings = {}; // Stores { perPage: number, currentPage: number } for each year
         let imageObserver = null;
         
-        /* ---------- Configuration ---------- */
-        const ROWS_PER_YEAR_INITIAL = 2;
-        const ROWS_PER_LOAD = 10;
-        
         /* ---------- Utility Functions ---------- */
-function calculatePhotosPerRow() {
-    const screenWidth = window.innerWidth;
-    
-    // Mobile breakpoint
-    if (screenWidth <= 768) return 3;
-    
-    // For all larger screens (including iPad Pro), calculate based on 
-    // actual container constraints, not screen width
-    const maxContainerWidth = 1000;  // Your CSS max-width
-    const containerPadding = 40;     // 20px on each side
-    const availableWidth = maxContainerWidth - containerPadding; // 960px
-    const gap = 12;
-    const minPhotoWidth = 120;       // From your CSS minmax(120px, 1fr)
-    
-    // Mathematical solution: find max n where each photo >= 120px
-    // Formula: (availableWidth - (n-1) * gap) / n >= minPhotoWidth
-    // Solving: n <= (availableWidth + gap) / (minPhotoWidth + gap)
-    const maxPhotosPerRow = Math.floor((availableWidth + gap) / (minPhotoWidth + gap));
-    
-    // Result: (960 + 12) / (120 + 12) = 972 / 132 = 7.36... so max 7
-    return Math.min(maxPhotosPerRow, 7); // This will always be 7 for screens > 768px
-} 
-
-
+        function calculatePhotosPerRow() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 768) return 3;
+            const maxContainerWidth = 1000;
+            const containerPadding = 40;
+            const availableWidth = maxContainerWidth - containerPadding;
+            const gap = 12;
+            const minPhotoWidth = 120;
+            return Math.floor((availableWidth + gap) / (minPhotoWidth + gap));
+        } 
       
-        function calculatePhotosFromRows(rows) {
-            return rows * calculatePhotosPerRow();
-        }
-        
         function generateImgurThumbnail(originalUrl, size = 'm') {
             const match = originalUrl.match(/https:\/\/i\.imgur\.com\/([^.]+)\.(\w+)/);
             if (match) {
@@ -484,121 +519,88 @@ function calculatePhotosPerRow() {
             setupSearch();
             setupIntersectionObserver();
             setupBackToTop();
-            setupFooterToggle(); // Add this line
+            setupFooterToggle();
             loadPhotoData();
         });
 
         /* ---------- Data Loading ---------- */
-// Replace ONLY the loadPhotoData function in your index.html
-async function loadPhotoData() {
-    try {
-        // Try new multi-year system first
-        const years = [2025, 2024, 2023]; // Add years as needed
-        let allPhotos = [];
-        
-        for (const year of years) {
+        async function loadPhotoData() {
             try {
-                const res = await fetch(`${year}.json?v=${Date.now()}`, { cache: 'no-store' });
-                if (res.ok) {
-                    const yearData = await res.json();
-                    if (Array.isArray(yearData)) {
-                        allPhotos.push(...yearData);
+                const years = [2025, 2024, 2023];
+                let allPhotos = [];
+                for (const year of years) {
+                    try {
+                        const res = await fetch(`${year}.json?v=${Date.now()}`, { cache: 'no-store' });
+                        if (res.ok) {
+                            const yearData = await res.json();
+                            if (Array.isArray(yearData)) allPhotos.push(...yearData);
+                        }
+                    } catch (err) {
+                        console.log(`No ${year}.json found, skipping`);
                     }
                 }
+                
+                if (allPhotos.length === 0) {
+                    console.log('No year files found, trying photoData.json...');
+                    const res = await fetch(`photoData.json?v=${Date.now()}`, { cache: 'no-store' });
+                    if (res.ok) allPhotos = await res.json();
+                }
+                
+                if (!Array.isArray(allPhotos) || allPhotos.length === 0) throw new Error('No valid photo data found');
+                
+                allPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+                allPhotos.forEach((photo, index) => { photo.id = index + 1; });
+                
+                photoData = allPhotos;
+                initializeTimeline();
+                
             } catch (err) {
-                console.log(`No ${year}.json found, skipping`);
+                console.error('Failed to load photo data:', err);
+                document.getElementById('timelineContainer').innerHTML = `
+                    <div class="timeline-empty"><h3>Could not load photo data</h3><p>Please check your connection and refresh.</p></div>`;
             }
         }
-        
-        // Fallback to old system if no year files found
-        if (allPhotos.length === 0) {
-            console.log('No year files found, trying photoData.json...');
-            const res = await fetch(`photoData.json?v=${Date.now()}`, { cache: 'no-store' });
-            if (res.ok) {
-                allPhotos = await res.json();
-            }
-        }
-        
-        if (!Array.isArray(allPhotos) || allPhotos.length === 0) {
-            throw new Error('No valid photo data found');
-        }
-        
-        // Sort by date and assign IDs
-        allPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
-        allPhotos.forEach((photo, index) => {
-            photo.id = index + 1;
-        });
-        
-        photoData = allPhotos;
-        initializeTimeline();
-        
-    } catch (err) {
-        console.error('Failed to load photo data:', err);
-        document.getElementById('timelineContainer').innerHTML = `
-            <div class="timeline-empty">
-                <h3>Could not load photo data</h3>
-                <p>Please check your connection and refresh the page.</p>
-            </div>`;
-    }
-}
 
-        /* ---------- Timeline Functions ---------- */
+        /* ---------- Timeline & Pagination Functions ---------- */
         function initializeTimeline() {
             if (photoData.length === 0) {
                 document.getElementById('timelineContainer').innerHTML = `
-                    <div class="timeline-empty">
-                        <h3>No photos found</h3>
-                        <p>Add photoData.json to your repository to display photos.</p>
-                    </div>`;
+                    <div class="timeline-empty"><h3>No photos found</h3><p>Add photoData.json to display photos.</p></div>`;
                 return;
             }
 
-            const photosByYear = {};
-            photoData.forEach(photo => {
-                if (!photosByYear[photo.year]) {
-                    photosByYear[photo.year] = [];
-                    yearPhotoDisplayCount[photo.year] = calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
-                }
-                photosByYear[photo.year].push(photo);
-            });
+            const photosByYear = photoData.reduce((acc, photo) => {
+                if (!acc[photo.year]) acc[photo.year] = [];
+                acc[photo.year].push(photo);
+                return acc;
+            }, {});
 
-            Object.keys(photosByYear).forEach(year => {
-                photosByYear[year].sort((a, b) => new Date(b.date) - new Date(a.date));
-            });
+            Object.values(photosByYear).forEach(yearPhotos => yearPhotos.sort((a, b) => new Date(b.date) - new Date(a.date)));
 
             createTimelineHTML(photosByYear);
             updateStats();
             initializeGame();
             
-            const sortedYears = Object.keys(photosByYear).sort((a, b) => parseInt(b) - parseInt(a));
-            if (sortedYears.length > 0) {
-                setTimeout(() => toggleYear(sortedYears[0]), 100);
-            }
+            const sortedYears = Object.keys(photosByYear).sort((a, b) => b - a);
+            if (sortedYears.length > 0) setTimeout(() => toggleYear(sortedYears[0]), 100);
         }
 
         function createTimelineHTML(photosByYear) {
-            const sortedYears = Object.keys(photosByYear).sort((a, b) => parseInt(b) - parseInt(a));
-            
+            const sortedYears = Object.keys(photosByYear).sort((a, b) => b - a);
             const timelineHTML = sortedYears.map(year => {
                 const photos = photosByYear[year];
-                const displayCount = yearPhotoDisplayCount[year] || calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
-                const hasMore = photos.length > displayCount;
-                
                 const photosPerRow = calculatePhotosPerRow();
                 const totalRows = Math.ceil(photos.length / photosPerRow);
                 
                 const previewPhotos = photos.slice(0, 4);
                 const previewHTML = `
                     <div class="year-preview">
-                        ${previewPhotos.map(photo => 
-                            `<img src="${generateImgurThumbnail(photo.url, 's')}" alt="Preview" class="preview-thumb">`
-                        ).join('')}
+                        ${previewPhotos.map(p => `<img src="${generateImgurThumbnail(p.url, 's')}" alt="Preview" class="preview-thumb">`).join('')}
                         ${photos.length > 4 ? `<div class="preview-more">+${photos.length - 4}</div>` : ''}
-                    </div>
-                `;
+                    </div>`;
                 
                 return `
-                    <div class="timeline-year" data-year="${year}" data-photo-count="${photos.length}">
+                    <div class="timeline-year" data-year="${year}">
                         <div class="timeline-year-header" onclick="toggleYear('${year}')">
                             <div class="year-header-content">
                                 <div class="year-header-top">
@@ -612,104 +614,171 @@ async function loadPhotoData() {
                             </div>
                         </div>
                         <div class="timeline-year-content">
-                            <div class="year-photos-grid" id="photos-${year}">
-                                ${generatePhotosHTML(photos.slice(0, displayCount))}
+                            <div class="year-controls">
+                                <label for="per-page-${year}">Photos per page:</label>
+                                <select id="per-page-${year}" onchange="changePhotosPerPage('${year}', this.value)">
+                                    <option value="21">21</option>
+                                    <option value="42">42</option>
+                                    <option value="84">84</option>
+                                    <option value="all">All</option>
+                                </select>
                             </div>
-                            ${hasMore ? `
-                                <button class="show-more-btn" onclick="loadMorePhotosForYear('${year}')">
-                                    Show More Photos • 展开更多 (${Math.ceil((photos.length - displayCount) / photosPerRow)} more rows, ${photos.length - displayCount} remaining)
-                                </button>
-                            ` : ''}
+                            <div class="year-photos-grid" id="photos-${year}"></div>
+                            <div class="pagination-nav" id="pagination-nav-${year}"></div>
                         </div>
                     </div>
                 `;
             }).join('');
-            
             document.getElementById('timelineContainer').innerHTML = timelineHTML;
-            setupLazyLoading();
         }
 
-function generatePhotosHTML(photos) {
-    return photos.map(photo => {
-        const thumbnailUrl = generateImgurThumbnail(photo.url, 'm');
-        return `
-            <div class="timeline-photo" onclick="openPhotoModal(${photo.id})">
-                <img data-src="${thumbnailUrl}" data-fullsize="${photo.url}" alt="Photo ${photo.id}" class="lazy-image">
-                <div class="photo-overlay">${photo.date}</div>
-            </div>
-        `;
-    }).join('');
-}
+        function generatePhotosHTML(photos) {
+            return photos.map(photo => `
+                <div class="timeline-photo" onclick="openPhotoModal(${photo.id})">
+                    <img data-src="${generateImgurThumbnail(photo.url, 'm')}" data-fullsize="${photo.url}" alt="Photo ${photo.id}" class="lazy-image">
+                    <div class="photo-overlay">${photo.date}</div>
+                </div>
+            `).join('');
+        }
+
         function toggleYear(year) {
             const yearElement = document.querySelector(`[data-year="${year}"]`);
-            const isExpanded = yearElement.classList.contains('expanded');
+            if (!yearElement) return;
+
+            const isExpanded = yearElement.classList.toggle('expanded');
             
             if (isExpanded) {
-                yearElement.classList.remove('expanded');
+                expandedYears.add(year);
+                if (!yearPaginationSettings[year]) {
+                    yearPaginationSettings[year] = { perPage: 21, currentPage: 1 };
+                }
+                document.getElementById(`per-page-${year}`).value = yearPaginationSettings[year].perPage === Infinity ? 'all' : yearPaginationSettings[year].perPage;
+                renderYearPage(year);
+            } else {
                 expandedYears.delete(year);
                 unloadYearImages(year);
-            } else {
-                yearElement.classList.add('expanded');
-                expandedYears.add(year);
-                
-                const initialCount = calculatePhotosFromRows(ROWS_PER_YEAR_INITIAL);
-                yearPhotoDisplayCount[year] = initialCount;
-                
-                const yearPhotos = photoData.filter(p => p.year === year);
-                const photosGrid = document.getElementById(`photos-${year}`);
-                const displayPhotos = yearPhotos.slice(0, initialCount);
-                const hasMore = yearPhotos.length > initialCount;
-                
-                photosGrid.innerHTML = generatePhotosHTML(displayPhotos);
-                
-                let showMoreBtn = photosGrid.parentElement.querySelector('.show-more-btn');
-                if (hasMore) {
-                    const remaining = yearPhotos.length - initialCount;
-                    const remainingRows = Math.ceil(remaining / calculatePhotosPerRow());
-                    
-                    if (showMoreBtn) {
-                        showMoreBtn.textContent = `Show More Photos • 展开更多 (${remainingRows} more rows, ${remaining} remaining)`;
-                        showMoreBtn.style.display = 'block';
-                    } else {
-                        photosGrid.insertAdjacentHTML('afterend', `
-                            <button class="show-more-btn" onclick="loadMorePhotosForYear('${year}')">
-                                Show More Photos • 展开更多 (${remainingRows} more rows, ${remaining} remaining)
-                            </button>
-                        `);
-                    }
-                } else if (showMoreBtn) {
-                    showMoreBtn.style.display = 'none';
-                }
-                
-                setupLazyLoadingForYear(year);
             }
-            
             updateStats();
         }
 
-        function loadMorePhotosForYear(year) {
-            const yearPhotos = photoData.filter(p => p.year === year);
-            const currentDisplayCount = yearPhotoDisplayCount[year];
-            const additionalPhotos = calculatePhotosFromRows(ROWS_PER_LOAD);
-            const newDisplayCount = Math.min(currentDisplayCount + additionalPhotos, yearPhotos.length);
-            
-            yearPhotoDisplayCount[year] = newDisplayCount;
-            
-            const photosGrid = document.getElementById(`photos-${year}`);
-            const newPhotos = yearPhotos.slice(currentDisplayCount, newDisplayCount);
-            
-            photosGrid.insertAdjacentHTML('beforeend', generatePhotosHTML(newPhotos));
-            
-            const showMoreBtn = photosGrid.parentElement.querySelector('.show-more-btn');
-            if (newDisplayCount >= yearPhotos.length) {
-                if (showMoreBtn) showMoreBtn.remove();
-            } else {
-                const remaining = yearPhotos.length - newDisplayCount;
-                const remainingRows = Math.ceil(remaining / calculatePhotosPerRow());
-                showMoreBtn.textContent = `Show More Photos • 展开更多 (${remainingRows} more rows, ${remaining} remaining)`;
+        function changePhotosPerPage(year, perPageValue) {
+            const perPage = perPageValue === 'all' ? Infinity : parseInt(perPageValue, 10);
+            yearPaginationSettings[year] = { perPage, currentPage: 1 };
+            renderYearPage(year);
+        }
+
+        function goToPage(year, page) {
+            if (!yearPaginationSettings[year]) return;
+            yearPaginationSettings[year].currentPage = parseInt(page, 10);
+            renderYearPage(year);
+            document.getElementById(`photos-${year}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function jumpToPage(year, totalPages) {
+            const inputElement = document.getElementById(`jump-to-input-${year}`);
+            if (!inputElement) return;
+
+            const pageNum = parseInt(inputElement.value, 10);
+
+            if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
+                alert(`Please enter a valid page number between 1 and ${totalPages}.`);
+                inputElement.value = ''; // Clear invalid input
+                inputElement.focus();
+                return;
             }
-            
+            goToPage(year, pageNum);
+        }
+
+        // --- BUG FIX APPLIED IN THIS FUNCTION ---
+        function renderYearPage(year) {
+            if (!yearPaginationSettings[year]) {
+                yearPaginationSettings[year] = { perPage: 21, currentPage: 1 };
+            }
+            const { perPage, currentPage } = yearPaginationSettings[year];
+            const yearPhotos = photoData.filter(p => p.year === year);
+            const totalPhotos = yearPhotos.length;
+            const photosGrid = document.getElementById(`photos-${year}`);
+            const paginationNav = document.getElementById(`pagination-nav-${year}`);
+
+            if (!photosGrid || !paginationNav) return;
+
+            let startIndex, endIndex;
+
+            // ** THE FIX IS HERE **
+            // Handle the "Show All" case separately to avoid NaN calculations
+            if (perPage === Infinity) {
+                startIndex = 0;
+                endIndex = totalPhotos;
+            } else {
+                startIndex = (currentPage - 1) * perPage;
+                endIndex = Math.min(startIndex + perPage, totalPhotos);
+            }
+
+            photosGrid.innerHTML = generatePhotosHTML(yearPhotos.slice(startIndex, endIndex));
+
+            paginationNav.innerHTML = '';
+            if (perPage !== Infinity && totalPhotos > perPage) {
+                const totalPages = Math.ceil(totalPhotos / perPage);
+                paginationNav.innerHTML = createPaginationButtons(year, currentPage, totalPages);
+                
+                // Add keydown listener for the jump input
+                const jumpInput = document.getElementById(`jump-to-input-${year}`);
+                if(jumpInput) {
+                    jumpInput.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault(); // Prevent form submission
+                            jumpToPage(year, totalPages);
+                        }
+                    });
+                }
+            }
             setupLazyLoadingForYear(year);
+        }
+        // --- END OF BUG FIX ---
+
+        function createPaginationButtons(year, currentPage, totalPages) {
+            let html = '';
+            const maxPagesToShow = 5;
+            let startPage, endPage;
+
+            if (totalPages <= maxPagesToShow) {
+                startPage = 1;
+                endPage = totalPages;
+            } else {
+                const maxBefore = Math.floor(maxPagesToShow / 2);
+                const maxAfter = Math.ceil(maxPagesToShow / 2) - 1;
+                if (currentPage <= maxBefore) {
+                    startPage = 1; endPage = maxPagesToShow;
+                } else if (currentPage + maxAfter >= totalPages) {
+                    startPage = totalPages - maxPagesToShow + 1; endPage = totalPages;
+                } else {
+                    startPage = currentPage - maxBefore; endPage = currentPage + maxAfter;
+                }
+            }
+
+            if (currentPage > 1) html += `<button class="btn" onclick="goToPage('${year}', ${currentPage - 1})">‹ Prev</button>`;
+            if (startPage > 1) {
+                html += `<button class="btn" onclick="goToPage('${year}', 1)">1</button>`;
+                if (startPage > 2) html += `<span>...</span>`;
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="btn ${i === currentPage ? 'primary' : ''}" ${i === currentPage ? 'disabled' : `onclick="goToPage('${year}', ${i})"`}>${i}</button>`;
+            }
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span>...</span>`;
+                html += `<button class="btn" onclick="goToPage('${year}', ${totalPages})">${totalPages}</button>`;
+            }
+            if (currentPage < totalPages) html += `<button class="btn" onclick="goToPage('${year}', ${currentPage + 1})">Next ›</button>`;
+            
+            // Add the jump to page input and button
+            html += `
+                <div class="jump-to-page">
+                    <input type="number" id="jump-to-input-${year}" min="1" max="${totalPages}" placeholder="Page #" title="Enter page number and press Go or Enter">
+                    <button class="btn" onclick="jumpToPage('${year}', ${totalPages})">Go</button>
+                </div>
+            `;
+
+            return html;
         }
 
         /* ---------- Lazy Loading ---------- */
@@ -720,17 +789,10 @@ function generatePhotosHTML(photos) {
                         const img = entry.target;
                         if (img.dataset.src && !img.src) {
                             img.src = img.dataset.src;
-                            img.onload = () => {
-                                img.classList.remove('loading-placeholder');
-                                img.removeAttribute('data-src');
-                            };
+                            img.onload = () => img.classList.remove('loading-placeholder');
                             img.onerror = () => {
-                                if (img.dataset.fullsize && img.dataset.fullsize !== img.dataset.src) {
-                                    img.src = img.dataset.fullsize;
-                                } else {
-                                    img.alt = 'Failed to load';
-                                    img.classList.remove('loading-placeholder');
-                                }
+                                if (img.dataset.fullsize) img.src = img.dataset.fullsize;
+                                else img.classList.remove('loading-placeholder');
                             };
                         }
                         imageObserver.unobserve(img);
@@ -755,11 +817,8 @@ function generatePhotosHTML(photos) {
 
         function unloadYearImages(year) {
             document.querySelectorAll(`#photos-${year} img`).forEach(img => {
-                if (img.src && img.src !== img.dataset.src) {
-                    img.dataset.src = img.src;
-                    img.src = '';
-                    img.classList.add('loading-placeholder');
-                }
+                img.src = '';
+                img.classList.add('loading-placeholder');
             });
         }
 
@@ -767,60 +826,40 @@ function generatePhotosHTML(photos) {
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
             let searchTimeout;
-            
-            searchInput.addEventListener('input', function() {
+            searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    performSearch(this.value.toLowerCase().trim());
-                }, 300);
+                searchTimeout = setTimeout(() => performSearch(searchInput.value.toLowerCase().trim()), 300);
             });
         }
 
         function performSearch(query) {
             const timelineContainer = document.getElementById('timelineContainer');
-            
             if (!query) {
                 initializeTimeline();
                 return;
             }
 
-            const matchingPhotos = photoData.filter(photo => {
-                const matchesYear = photo.year.includes(query);
-                const matchesMonth = photo.month.toLowerCase().includes(query.toLowerCase());
-                const matchesDate = photo.date.includes(query);
-                const matchesTags = Array.isArray(photo.tags) && 
-                    photo.tags.some(tag => String(tag).toLowerCase().includes(query.toLowerCase()));
-                
-                return matchesYear || matchesMonth || matchesDate || matchesTags;
-            });
+            const matchingPhotos = photoData.filter(p => 
+                p.year.includes(query) || p.month.toLowerCase().includes(query) || p.date.includes(query) ||
+                (Array.isArray(p.tags) && p.tags.some(t => String(t).toLowerCase().includes(query)))
+            );
 
             if (matchingPhotos.length === 0) {
-                timelineContainer.innerHTML = `
-                    <div class="timeline-empty">
-                        <h3>No photos found</h3>
-                        <p>No photos match "${query}". Try different keywords.</p>
-                    </div>`;
+                timelineContainer.innerHTML = `<div class="timeline-empty"><h3>No photos found</h3><p>No results for "${query}".</p></div>`;
                 updateSearchStats(0, 0);
                 return;
             }
 
-            const resultsHTML = `
+            timelineContainer.innerHTML = `
                 <div class="search-results">
                     <div class="search-results-header">
                         <h3>Search Results for "${query}"</h3>
                         <p>${matchingPhotos.length} photos found</p>
                         <p class="search-hint">Click thumbnails for high-res photos • 点击缩略图打开高清图</p>
-                        <button class="clear-search-btn" onclick="clearSearch()">
-                            ← Back to Timeline <br> 回时间线
-                        </button>
+                        <button class="clear-search-btn" onclick="clearSearch()">← Back to Timeline <br> 回时间线</button>
                     </div>
-                    <div class="year-photos-grid">
-                        ${generatePhotosHTML(matchingPhotos)}
-                    </div>
-                </div>
-            `;
-
-            timelineContainer.innerHTML = resultsHTML;
+                    <div class="year-photos-grid">${generatePhotosHTML(matchingPhotos)}</div>
+                </div>`;
             setupLazyLoading();
             updateSearchStats(matchingPhotos.length, matchingPhotos.length);
         }
@@ -830,29 +869,24 @@ function generatePhotosHTML(photos) {
             initializeTimeline();
         }
 
-        function updateSearchStats(totalPhotos, matchingPhotos) {
-            document.getElementById('totalPhotosDisplay').textContent = totalPhotos.toLocaleString();
-            document.getElementById('yearsSpanDisplay').textContent = matchingPhotos > 0 ? 'Search' : '0';
-            document.getElementById('expandedYearsDisplay').textContent = matchingPhotos > 0 ? 'Results' : '0';
+        function updateSearchStats(total, matching) {
+            document.getElementById('totalPhotosDisplay').textContent = total.toLocaleString();
+            document.getElementById('yearsSpanDisplay').textContent = matching > 0 ? 'Search' : '0';
+            document.getElementById('expandedYearsDisplay').textContent = matching > 0 ? 'Results' : '0';
         }
 
         /* ---------- Statistics ---------- */
         function updateStats() {
-            const totalPhotos = photoData.length;
-            const totalYears = new Set(photoData.map(p => p.year)).size;
-            const expandedCount = expandedYears.size;
-            
-            document.getElementById('totalPhotosDisplay').textContent = totalPhotos.toLocaleString();
-            document.getElementById('yearsSpanDisplay').textContent = totalYears;
-            document.getElementById('expandedYearsDisplay').textContent = expandedCount;
+            document.getElementById('totalPhotosDisplay').textContent = photoData.length.toLocaleString();
+            document.getElementById('yearsSpanDisplay').textContent = new Set(photoData.map(p => p.year)).size;
+            document.getElementById('expandedYearsDisplay').textContent = expandedYears.size;
         }
 
         /* ---------- Navigation ---------- */
         function setupNavigation() {
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const section = this.getAttribute('data-section');
-                    showSection(section);
+                    showSection(this.dataset.section);
                     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                 });
@@ -870,130 +904,83 @@ function generatePhotosHTML(photos) {
             const photo = photoData.find(p => p.id === photoId);
             if (!photo) return;
             
+            const modal = document.getElementById('photoModal');
             const modalImg = document.getElementById('modalPhoto');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const weiboBtn = document.getElementById('weiboLinkBtn');
+            
             modalImg.src = photo.url;
-            modalImg.onload = function() {
-                document.getElementById('downloadBtn').disabled = false;
-                document.getElementById('downloadBtn').style.opacity = '1';
-            };
+            modalImg.onload = () => { downloadBtn.disabled = false; downloadBtn.style.opacity = '1'; };
             
             document.getElementById('modalTitle').textContent = `Photo ${photo.id}`;
             document.getElementById('modalDate').textContent = `Posted in ${photo.month} ${photo.year}`;
             
             window.currentPhotoForDownload = photo;
             
-            const weiboBtn = document.getElementById('weiboLinkBtn');
-            if (photo.weibo && typeof photo.weibo === 'string' && photo.weibo.trim()) {
+            if (photo.weibo && String(photo.weibo).trim()) {
                 const w = photo.weibo.trim();
-                const normalized = /^https?:\/\//i.test(w) ? w : `https://${w}`;
-                weiboBtn.href = normalized; 
+                weiboBtn.href = /^https?:\/\//i.test(w) ? w : `https://${w}`; 
                 weiboBtn.style.display = 'inline-block';
             } else {
                 weiboBtn.style.display = 'none';
             }
             
-            document.getElementById('photoModal').classList.remove('hidden');
-            document.getElementById('downloadBtn').disabled = true;
-            document.getElementById('downloadBtn').style.opacity = '0.6';
+            modal.classList.remove('hidden');
+            downloadBtn.disabled = true;
+            downloadBtn.style.opacity = '0.6';
         }
         
-        function closeModal() { 
-            document.getElementById('photoModal').classList.add('hidden'); 
-        }
+        function closeModal() { document.getElementById('photoModal').classList.add('hidden'); }
 
-async function downloadPhoto() {
-    if (!window.currentPhotoForDownload) return;
-    
-    const photo = window.currentPhotoForDownload;
-    const downloadBtn = document.getElementById('downloadBtn');
-    
-    try {
-        downloadBtn.textContent = 'Downloading...';
-        downloadBtn.disabled = true;
-        
-        const response = await fetch(photo.url);
-        const blob = await response.blob();
-        
-        // Get file extension
-        const fileExtension = photo.url.split('.').pop().split('?')[0] || 'jpg';
-        const suggestedName = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${fileExtension}`;
-        
-        // Try File System Access API first (Chrome/Edge)
-        if (window.showSaveFilePicker) {
+        async function downloadPhoto() {
+            if (!window.currentPhotoForDownload) return;
+            const photo = window.currentPhotoForDownload;
+            const btn = document.getElementById('downloadBtn');
+            
             try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: suggestedName,
-                    types: [{
-                        description: 'Image Files',
-                        accept: {
-                            'image/jpeg': ['.jpg', '.jpeg'],
-                            'image/png': ['.png'],
-                            'image/gif': ['.gif'],
-                            'image/webp': ['.webp']
-                        }
-                    }]
-                });
-                
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                
-                downloadBtn.textContent = 'Downloaded to chosen folder!';
-                setTimeout(() => {
-                    downloadBtn.textContent = 'Download High-Res';
-                    downloadBtn.disabled = false;
-                }, 2000);
-                
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    downloadBtn.textContent = 'Download cancelled';
+                btn.textContent = 'Downloading...';
+                btn.disabled = true;
+                const res = await fetch(photo.url);
+                const blob = await res.blob();
+                const ext = photo.url.split('.').pop().split('?')[0] || 'jpg';
+                const name = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${ext}`;
+
+                if (window.showSaveFilePicker) {
+                    const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Image Files', accept: {'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'], 'image/gif': ['.gif'], 'image/webp': ['.webp']} }] });
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    btn.textContent = 'Downloaded!';
                 } else {
-                    throw err; // Fall back to standard download
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = name;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    btn.textContent = 'Downloaded!';
                 }
+            } catch (error) {
+                console.error('Download failed:', error);
+                if (error.name !== 'AbortError') {
+                    window.open(photo.url, '_blank');
+                    btn.textContent = 'Error - Opened in new tab';
+                } else {
+                    btn.textContent = 'Cancelled';
+                }
+            } finally {
+                setTimeout(() => {
+                    btn.textContent = '📥 Download High-Res';
+                    btn.disabled = false;
+                }, 3000);
             }
-        } else {
-            // Fallback for Safari/Firefox/older browsers
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = suggestedName;
-            
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            
-            downloadBtn.textContent = 'Downloaded! (Chrome/Edge allow folder choice)';
         }
-        
-        setTimeout(() => {
-            downloadBtn.textContent = 'Download High-Res';
-            downloadBtn.disabled = false;
-        }, 3000);
-        
-    } catch (error) {
-        console.error('Download failed:', error);
-        
-        // Final fallback - open in new tab
-        window.open(photo.url, '_blank');
-        
-        downloadBtn.textContent = 'Error - Opened in new tab';
-        setTimeout(() => {
-            downloadBtn.textContent = 'Download High-Res';
-            downloadBtn.disabled = false;
-        }, 3000);
-    }
-}
-
-
 
         /* ---------- Modal Event Listeners ---------- */
-        document.getElementById('photoModal').addEventListener('click', function(e) { 
-            if (e.target === this) closeModal(); 
-        });
-        document.addEventListener('keydown', function(e) { 
-            if (e.key === 'Escape') closeModal(); 
-        });
+        document.getElementById('photoModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
         /* ---------- Game Functions ---------- */
         document.getElementById('startGame').addEventListener('click', startGame);
@@ -1001,22 +988,18 @@ async function downloadPhoto() {
         document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
 
         function initializeGame() {
-            if (!gameActive && photoData.length > 0) {
+            const startBtn = document.getElementById('startGame');
+            if (photoData.length === 0) {
                 document.getElementById('gamePhoto').src = createDefaultGameImage();
-            } else if (photoData.length === 0) {
-                document.getElementById('gamePhoto').src = createDefaultGameImage();
-                const startBtn = document.getElementById('startGame');
                 startBtn.textContent = 'Add Photos First'; 
                 startBtn.disabled = true; 
-                startBtn.style.opacity = '0.5';
+            } else if (!gameActive) {
+                document.getElementById('gamePhoto').src = createDefaultGameImage();
             }
         }
         
         function startGame() {
-            if (photoData.length === 0) { 
-                alert('No photos available for the game!'); 
-                return; 
-            }
+            if (photoData.length === 0) return; 
             gameActive = true; 
             document.getElementById('startGame').classList.add('hidden');
             document.getElementById('newGame').classList.remove('hidden'); 
@@ -1024,22 +1007,13 @@ async function downloadPhoto() {
         }
         
         function newGame() {
-            if (photoData.length === 0) { 
-                alert('No photos available for the game!'); 
-                return; 
-            }
-            gameScore = 0; 
-            gameStreak = 0; 
-            totalQuestions = 0; 
+            gameScore = gameStreak = totalQuestions = 0; 
             updateGameStats(); 
             nextQuestion();
         }
         
         function nextQuestion() {
-            if (photoData.length === 0) { 
-                alert('No photos available for the game!'); 
-                return; 
-            }
+            if (photoData.length === 0) return; 
             document.getElementById('gameResult').classList.add('hidden');
             document.getElementById('nextQuestion').classList.add('hidden');
             currentPhoto = photoData[Math.floor(Math.random() * photoData.length)];
@@ -1047,47 +1021,40 @@ async function downloadPhoto() {
             displayGameOptions(generateOptions(currentPhoto));
         }
         
-function generateOptions(correctPhoto) {
-    const dateParts = correctPhoto.date.split('-');
-    const correctOption = `${dateParts[0]}-${dateParts[1]}`; // Gets "2025-08"
-    
-    const options = [correctOption];
-    const years = [...new Set(photoData.map(p => p.year))];
-    
-    while (options.length < 4) {
-        const randomYear = years[Math.floor(Math.random() * years.length)] || correctPhoto.year;
-        const randomMonth = Math.floor(Math.random() * 12) + 1;
-        const option = `${randomYear}-${randomMonth.toString().padStart(2, '0')}`;
-        if (!options.includes(option)) options.push(option);
-    }
-    return options.sort(() => Math.random() - 0.5);
-}
-
+        function generateOptions(correctPhoto) {
+            const correctOption = correctPhoto.date.substring(0, 7); // "YYYY-MM"
+            const options = new Set([correctOption]);
+            const years = [...new Set(photoData.map(p => p.year))];
+            
+            while (options.size < 4) {
+                const year = years[Math.floor(Math.random() * years.length)];
+                const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+                options.add(`${year}-${month}`);
+            }
+            return [...options].sort(() => Math.random() - 0.5);
+        }
         
         function displayGameOptions(options) {
-            document.getElementById('gameOptions').innerHTML = options.map(option => 
-                `<button class="option-btn" onclick="selectOption('${option}')">${option}</button>`
+            document.getElementById('gameOptions').innerHTML = options.map(opt => 
+                `<button class="option-btn" onclick="selectOption('${opt}')">${opt}</button>`
             ).join('');
         }
         
-function selectOption(selectedOption) {
-    const dateParts = currentPhoto.date.split('-');
-    const correctAnswer = `${dateParts[0]}-${dateParts[1]}`; // Gets "2025-08"
-    
-    const isCorrect = selectedOption === correctAnswer; 
-    totalQuestions++;
-    if (isCorrect) { 
-        gameScore++; 
-        gameStreak++; 
-        showGameResult('Correct! 正确!', 'correct'); 
-    } else { 
-        gameStreak = 0; 
-        showGameResult(`Wrong! It was ${correctAnswer}`, 'incorrect'); 
-    }
-    updateGameStats(); 
-    highlightOptions(selectedOption, correctAnswer);
-    document.getElementById('nextQuestion').classList.remove('hidden');
-}
+        function selectOption(selected) {
+            const correctAnswer = currentPhoto.date.substring(0, 7);
+            const isCorrect = selected === correctAnswer; 
+            totalQuestions++;
+            if (isCorrect) { 
+                gameScore++; gameStreak++; 
+                showGameResult('Correct! 正确!', 'correct'); 
+            } else { 
+                gameStreak = 0; 
+                showGameResult(`Wrong! It was ${correctAnswer}`, 'incorrect'); 
+            }
+            updateGameStats(); 
+            highlightOptions(selected, correctAnswer);
+            document.getElementById('nextQuestion').classList.remove('hidden');
+        }
         
         function showGameResult(message, type) {
             const resultDiv = document.getElementById('gameResult');
@@ -1096,11 +1063,11 @@ function selectOption(selectedOption) {
             resultDiv.classList.remove('hidden');
         }
         
-        function highlightOptions(selectedOption, correctAnswer) {
+        function highlightOptions(selected, correct) {
             document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.style.pointerEvents = 'none';
-                if (btn.textContent === correctAnswer) btn.classList.add('correct');
-                else if (btn.textContent === selectedOption && selectedOption !== correctAnswer) btn.classList.add('incorrect');
+                btn.disabled = true;
+                if (btn.textContent === correct) btn.classList.add('correct');
+                else if (btn.textContent === selected) btn.classList.add('incorrect');
             });
         }
         
@@ -1111,16 +1078,7 @@ function selectOption(selectedOption) {
         }
 
         function createDefaultGameImage() {
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-                <defs>
-                    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <rect width="400" height="300" fill="url(#bg)"/>
-                <text x="200" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">Game Photo Here</text>
-            </svg>`;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><text x="200" y="150" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">Game Photo Here</text></svg>`;
             return 'data:image/svg+xml,' + encodeURIComponent(svg);
         }
 
@@ -1128,77 +1086,28 @@ function selectOption(selectedOption) {
         function setupBackToTop() {
             const btn = document.getElementById('back-to-top');
             if (!btn) return;
-            
-            let ticking = false;
-            
-            function updateBackToTop() {
-                if (window.scrollY > 300) {
-                    btn.classList.add('visible');
-                } else {
-                    btn.classList.remove('visible');
-                }
-                ticking = false;
-            }
-            
-            window.addEventListener('scroll', function() {
-                if (!ticking) {
-                    requestAnimationFrame(updateBackToTop);
-                    ticking = true;
-                }
-            });
-            
-            btn.addEventListener('click', function() {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            window.addEventListener('scroll', () => {
+                window.requestAnimationFrame(() => {
+                    btn.classList.toggle('visible', window.scrollY > 300);
+                });
+            }, { passive: true });
+            btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         }
 
         /* ---------- Footer Toggle Function ---------- */
         function setupFooterToggle() {
             const termsToggle = document.getElementById('terms-toggle');
-            if (termsToggle) {
-                termsToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const termsContent = document.getElementById('terms-content');
-                    if (termsContent) {
-                        const isCurrentlyHidden = termsContent.style.display === 'none' || !termsContent.style.display;
-                        termsContent.style.display = isCurrentlyHidden ? 'block' : 'none';
-                        
-                        // If we're showing the terms, scroll to them smoothly
-                        if (isCurrentlyHidden) {
-                            setTimeout(() => {
-                                termsContent.scrollIntoView({ 
-                                    behavior: 'smooth', 
-                                    block: 'start' 
-                                });
-                            }, 100); // Small delay to ensure the content is rendered
-                        }
-                    }
-                });
-            }
+            if (!termsToggle) return;
+            termsToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const termsContent = document.getElementById('terms-content');
+                const isHidden = termsContent.style.display === 'none' || !termsContent.style.display;
+                termsContent.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) termsContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
         }
-
-        /* ---------- Window Resize Handling ---------- */
-        let resizeTimeout;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                const newPhotosPerRow = calculatePhotosPerRow();
-                document.querySelectorAll('.show-more-btn').forEach(btn => {
-                    const yearMatch = btn.getAttribute('onclick').match(/loadMorePhotosForYear\('(\d+)'\)/);
-                    if (yearMatch) {
-                        const year = yearMatch[1];
-                        const yearPhotos = photoData.filter(p => p.year === year);
-                        const currentDisplayCount = yearPhotoDisplayCount[year];
-                        const remaining = yearPhotos.length - currentDisplayCount;
-                        const remainingRows = Math.ceil(remaining / newPhotosPerRow);
-                        btn.textContent = `Show More Photos • 展开更多 (${remainingRows} more rows, ${remaining} remaining)`;
-                    }
-                });
-            }, 250);
-        });
     </script>
 
-    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
             <div style="margin-bottom:15px;font-weight:700;">Explore more</div>
