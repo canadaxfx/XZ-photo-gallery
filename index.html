@@ -227,19 +227,162 @@
         }
         .timeline-empty h3 { color: #667eea; margin-bottom: 10px; }
 
-        /* Modal Styles */
+        /* Enhanced Modal Styles - Mobile Optimized */
         .modal { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8);
-            display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; 
+            display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 10px; 
+            overflow-y: auto;
         }
         .modal-content { 
-            background: white; border-radius: 15px; padding: 30px; max-width: 500px; 
+            background: white; border-radius: 15px; padding: 20px; max-width: 600px; 
             width: 100%; text-align: center; position: relative; 
+            max-height: 95vh;
+            overflow-y: auto;
+            margin: auto;
         }
-        .modal img { max-width: 100%; max-height: 400px; border-radius: 10px; margin-bottom: 20px; }
+        .modal img { max-width: 100%; max-height: 300px; border-radius: 10px; margin-bottom: 15px; }
         .close-modal { 
             position: absolute; top: 10px; right: 15px; background: none; border: none; 
-            font-size: 24px; cursor: pointer; color: #666; 
+            font-size: 24px; cursor: pointer; color: #666; z-index: 1001;
+        }
+
+        /* Enhanced Download Section */
+        .download-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .download-section h4 {
+            color: #495057;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .download-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .download-option {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .download-option:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .download-option h5 {
+            margin-bottom: 6px;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .download-option p {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        /* Download and Share Buttons */
+        .download-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049); color: white; border: none;
+            padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; width: 100%; display: block;
+        }
+        .download-btn:hover {
+            background: linear-gradient(45deg, #45a049, #3d8b40);
+            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .quark-btn {
+            background: linear-gradient(45deg, #FF6B35, #F7931E); color: white; border: none;
+            padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; width: 100%; display: block;
+            text-decoration: none;
+        }
+        .quark-btn:hover {
+            background: linear-gradient(45deg, #E55A2B, #E8851A);
+            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+        
+        .quark-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .download-hint { 
+            font-size: 11px; color: #666; margin: 8px 0 10px; text-align: center; opacity: 0.8; 
+        }
+        
+        /* Enhanced Weibo Section with Photo Info */
+        .weibo-section {
+            background: linear-gradient(45deg, #fa2a55, #e91e63);
+            color: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .weibo-photo-info {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .weibo-link-btn {
+            background: rgba(255,255,255,0.2) !important; 
+            color: white !important;
+            padding: 10px 20px !important; 
+            border: 2px solid rgba(255,255,255,0.3) !important; 
+            border-radius: 8px !important;
+            font-size: 14px !important; 
+            font-weight: 600 !important; 
+            text-decoration: none !important;
+            display: inline-block !important; 
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px);
+        }
+        .weibo-link-btn:hover {
+            background: rgba(255,255,255,0.3) !important;
+            border-color: rgba(255,255,255,0.5) !important;
+            transform: translateY(-2px) !important; 
+            box-shadow: 0 4px 12px rgba(255,255,255,0.2) !important;
+        }
+
+        /* Group Info Styles */
+        .group-info {
+            background: linear-gradient(45deg, #e3f2fd, #f3e5f5);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .group-info h5 {
+            color: #1976D2;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .group-info p {
+            color: #424242;
+            font-size: 12px;
+            margin: 0;
         }
 
         /* Game Section */
@@ -313,30 +456,6 @@
             50% { box-shadow: 0 4px 20px rgba(229, 62, 62, 0.3); }
         }
 
-
-        /* Download and Share Buttons */
-        .download-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049); color: white; border: none;
-            padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease; margin-right: 10px; display: inline-block;
-        }
-        .download-btn:hover {
-            background: linear-gradient(45deg, #45a049, #3d8b40);
-            transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-        }
-        .download-hint { font-size: 12px; color: #666; margin: 10px 0 15px; text-align: center; opacity: 0.8; }
-        .share-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        #weiboLinkBtn {
-            background: linear-gradient(45deg, #fa2a55, #e91e63) !important; color: white !important;
-            padding: 12px 20px !important; border: none !important; border-radius: 8px !important;
-            font-size: 14px !important; font-weight: 600 !important; text-decoration: none !important;
-            display: inline-block !important; margin: 0 5px !important; transition: all 0.3s ease !important;
-        }
-        #weiboLinkBtn:hover {
-            background: linear-gradient(45deg, #e91e63, #d81b60) !important;
-            transform: translateY(-2px) !important; box-shadow: 0 4px 12px rgba(249, 42, 85, 0.3) !important;
-        }
-
         /* Search Results */
         .search-results { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         .search-results-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
@@ -374,7 +493,110 @@
             .search-results-header h3 { font-size: 1.2rem; }
             .clear-search-btn { padding: 10px 20px; font-size: 13px; }
             .game-stats {flex-wrap: nowrap; gap: 8px; margin: 15px 0; }
-	    .stat { padding: 10px 12px; font-size: 12px; border-radius: 10px; flex: 1; text-align: center; min-width: 0; /* Allow shrinking */}
+            .stat { padding: 10px 12px; font-size: 12px; border-radius: 10px; flex: 1; text-align: center; min-width: 0; }
+            
+            /* Mobile Modal Optimizations */
+            .modal {
+                padding: 5px;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+                padding: 15px;
+                max-height: 90vh;
+                margin-top: 0;
+            }
+            
+            .modal img { 
+                max-height: 200px;
+                margin-bottom: 10px;
+            }
+            
+            .download-options {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .download-section {
+                padding: 12px;
+                margin-top: 10px;
+            }
+            
+            .download-section h4 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .download-option {
+                padding: 10px;
+            }
+            
+            .download-option h5 {
+                font-size: 12px;
+            }
+            
+            .download-option p {
+                font-size: 10px;
+            }
+            
+            .download-btn, .quark-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .download-hint {
+                font-size: 10px;
+                margin: 6px 0 8px;
+            }
+            
+            .weibo-section {
+                padding: 10px;
+                margin-top: 10px;
+            }
+            
+            .weibo-photo-info {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+            
+            .weibo-link-btn {
+                padding: 8px 16px !important;
+                font-size: 12px !important;
+            }
+            
+            .close-modal {
+                font-size: 20px;
+                top: 8px;
+                right: 12px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .modal {
+                padding: 2px;
+                padding-top: 10px;
+            }
+            
+            .modal-content {
+                padding: 12px;
+                border-radius: 10px;
+                max-height: 95vh;
+            }
+            
+            .modal img {
+                max-height: 160px;
+            }
+            
+            .download-section h4 {
+                font-size: 13px;
+            }
+            
+            .weibo-photo-info {
+                font-size: 10px;
+            }
         }
 
         /* Footer Styles */
@@ -401,7 +623,8 @@
     <div class="container">
         <header>
             <h1>Xiao Zhan Studio Gallery<br>肖战工作室高清相册</h1>
-            <p class="subtitle" style="font-weight: 600; color: white;">High-resolution photos from XZ Studio<br>Slightly compressed photos for faster loading speed:<a href="https://canadaxfx.github.io/XZ-photo-gallery/" target="_blank" class="footer-link">此为主站，图片轻压缩，加载较块</a> <br>For  uncompressed photos please visit:<a href="https://canadaxfx.github.io/XZ-gallery-full-size/" target="_blank" class="footer-link">Backup Gallery (图片无压缩副站，加载较慢)</a>  </p>
+            <p class="subtitle" style="font-weight: 600; color: white;">High-resolution photos from XZ Studio<br>(Slightly compressed photos and full size uncompressed photo sets available)</a>
+<br><!--------------For  uncompressed photos please visit:<a href="https://canadaxfx.github.io/XZ-gallery-full-size/" target="_blank" class="footer-link">Backup Gallery (图片无压缩副站，加载较慢)</a></p>---------->  
         </header>
 
         <nav class="nav-buttons">
@@ -425,7 +648,7 @@
                 </div>
             </div>
 
-            <input type="text" class="search-bar" placeholder="Search photos by year, month, keywords..." id="searchInput">
+            <input type="text" class="search-bar" placeholder="Search photos by year, keywords 关键词搜索" id="searchInput">
 
             <div class="timeline-container" id="timelineContainer">
                 <div class="timeline-empty">
@@ -465,16 +688,46 @@
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal()">&times;</button>
             <img id="modalPhoto" alt="Full size photo">
-            <h3 id="modalTitle"></h3>
-            <p id="modalDate"></p>
             
-            <p class="download-hint">💾 Right-click image to save, or use button below</p>
+            <!-- Enhanced Download Section -->
+            <div class="download-section">
+                <h4>🔥 Download Options 下载选项</h4>
+                
+                <div class="download-options">
+                    <!-- Individual Photo Download -->
+                    <div class="download-option">
+                        <h5>🖼️ Single Photo</h5>
+                        <p>Compressed slightly</p>
+                        <button class="download-btn" id="downloadBtn" onclick="downloadPhoto()">
+                            🔥 Download This Image<br>下载单张 (轻压缩) 
+                        </button>
+                    </div>
+                    
+
+
+
+<div class="download-option">
+    <h5>📁 Photo Collection on Quark</h5>
+    <p>Uncompressed photo set</p>
+    <a class="quark-btn" id="quarkDownloadBtn" target="_blank">
+        🌟 Download Full Size Photo Set<br>
+        <span id="batchDownloadDesc">Get all photos from this set</span><br>
+        下载夸克合集 (无压缩)
+    </a>
+</div>
+</div>
+
+               
+            </div>
             
-            <div class="share-buttons">
-                <button class="download-btn" id="downloadBtn" onclick="downloadPhoto()">
-                    📥 Download High-Res<br>高清下载
-                </button>
-                <a class="share-btn" id="weiboLinkBtn" target="_blank">Weibo<br>微博</a>
+            <!-- Enhanced Weibo Section with Photo Info -->
+            <div class="weibo-section" id="weiboSection">
+                <div class="weibo-photo-info" id="weiboPhotoInfo">
+                    <!-- Photo info will be populated here -->
+                </div>
+                <a class="weibo-link-btn" id="weiboLinkBtn" target="_blank">
+                    📱 View on Weibo 微博
+                </a>
             </div>
         </div>
     </div>
@@ -483,6 +736,7 @@
         <div class="arrow">▲</div>
         <div class="text">TOP<br>回顶部</div>
     </div>
+    
     <script>
         /* ---------- Core Variables ---------- */
         let photoData = [];
@@ -511,6 +765,41 @@
             }
             console.warn('Could not parse Imgur URL for thumbnail:', originalUrl);
             return originalUrl;
+        }
+
+        /* ---------- Photo Group Management ---------- */
+        function getPhotoGroup(photo) {
+            // If photo has explicit group info, use it
+            if (photo.groupName && photo.quarkLink) {
+                return {
+                    name: photo.groupName,
+                    link: photo.quarkLink,
+                    description: photo.groupDescription || `Photos from ${photo.groupName}`
+                };
+            }
+            
+            // Auto-group by date and tags if no explicit group
+            const sameDate = photoData.filter(p => p.date === photo.date);
+            if (sameDate.length > 1) {
+                // Check if any photo in the same date has a quark link
+                const groupWithQuark = sameDate.find(p => p.quarkLink);
+                if (groupWithQuark) {
+                    return {
+                        name: groupWithQuark.groupName || `${photo.date} Collection`,
+                        link: groupWithQuark.quarkLink,
+                        description: groupWithQuark.groupDescription || `${sameDate.length} photos from ${photo.date}`
+                    };
+                }
+            }
+            
+            return null;
+        }
+        
+        function countGroupPhotos(groupName, quarkLink) {
+            return photoData.filter(p => 
+                (p.groupName === groupName) || 
+                (p.quarkLink === quarkLink && quarkLink)
+            ).length;
         }
 
         /* ---------- Initialization ---------- */
@@ -689,7 +978,6 @@
             goToPage(year, pageNum);
         }
 
-        // --- BUG FIX APPLIED IN THIS FUNCTION ---
         function renderYearPage(year) {
             if (!yearPaginationSettings[year]) {
                 yearPaginationSettings[year] = { perPage: 21, currentPage: 1 };
@@ -704,8 +992,6 @@
 
             let startIndex, endIndex;
 
-            // ** THE FIX IS HERE **
-            // Handle the "Show All" case separately to avoid NaN calculations
             if (perPage === Infinity) {
                 startIndex = 0;
                 endIndex = totalPhotos;
@@ -721,12 +1007,11 @@
                 const totalPages = Math.ceil(totalPhotos / perPage);
                 paginationNav.innerHTML = createPaginationButtons(year, currentPage, totalPages);
                 
-                // Add keydown listener for the jump input
                 const jumpInput = document.getElementById(`jump-to-input-${year}`);
                 if(jumpInput) {
                     jumpInput.addEventListener('keydown', (event) => {
                         if (event.key === 'Enter') {
-                            event.preventDefault(); // Prevent form submission
+                            event.preventDefault();
                             jumpToPage(year, totalPages);
                         }
                     });
@@ -734,7 +1019,6 @@
             }
             setupLazyLoadingForYear(year);
         }
-        // --- END OF BUG FIX ---
 
         function createPaginationButtons(year, currentPage, totalPages) {
             let html = '';
@@ -770,7 +1054,6 @@
             }
             if (currentPage < totalPages) html += `<button class="btn" onclick="goToPage('${year}', ${currentPage + 1})">Next ›</button>`;
             
-            // Add the jump to page input and button
             html += `
                 <div class="jump-to-page">
                     <input type="number" id="jump-to-input-${year}" min="1" max="${totalPages}" placeholder="Page #" title="Enter page number and press Go or Enter">
@@ -899,7 +1182,7 @@
             if (section === 'game') initializeGame();
         }
 
-        /* ---------- Modal and Download Functions ---------- */
+        /* ---------- Enhanced Modal and Download Functions ---------- */
         function openPhotoModal(photoId) {
             const photo = photoData.find(p => p.id === photoId);
             if (!photo) return;
@@ -907,22 +1190,44 @@
             const modal = document.getElementById('photoModal');
             const modalImg = document.getElementById('modalPhoto');
             const downloadBtn = document.getElementById('downloadBtn');
+            const quarkBtn = document.getElementById('quarkDownloadBtn');
+            const weiboSection = document.getElementById('weiboSection');
+            const weiboPhotoInfo = document.getElementById('weiboPhotoInfo');
             const weiboBtn = document.getElementById('weiboLinkBtn');
+            const batchDownloadDesc = document.getElementById('batchDownloadDesc');
             
             modalImg.src = photo.url;
-            modalImg.onload = () => { downloadBtn.disabled = false; downloadBtn.style.opacity = '1'; };
+            modalImg.onload = () => { 
+                downloadBtn.disabled = false; 
+                downloadBtn.style.opacity = '1'; 
+            };
             
-            document.getElementById('modalTitle').textContent = `Photo ${photo.id}`;
-            document.getElementById('modalDate').textContent = `Posted in ${photo.month} ${photo.year}`;
+            // Set photo info in the Weibo section
+            weiboPhotoInfo.textContent = `Posted in ${photo.month} ${photo.year}`;
             
             window.currentPhotoForDownload = photo;
             
+            // Handle photo group download options
+            const group = getPhotoGroup(photo);
+            if (group) {
+                quarkBtn.href = group.link;
+                quarkBtn.style.display = 'block';
+                quarkBtn.disabled = false;
+                
+                const groupPhotoCount = countGroupPhotos(group.name, group.link);
+                batchDownloadDesc.textContent = `${groupPhotoCount} photos in this collection`;
+            } else {
+                quarkBtn.style.display = 'none';
+                batchDownloadDesc.textContent = 'No collection available for this photo';
+            }
+            
+            // Handle Weibo link and section visibility
             if (photo.weibo && String(photo.weibo).trim()) {
                 const w = photo.weibo.trim();
                 weiboBtn.href = /^https?:\/\//i.test(w) ? w : `https://${w}`; 
-                weiboBtn.style.display = 'inline-block';
+                weiboSection.style.display = 'block';
             } else {
-                weiboBtn.style.display = 'none';
+                weiboSection.style.display = 'none';
             }
             
             modal.classList.remove('hidden');
@@ -930,7 +1235,9 @@
             downloadBtn.style.opacity = '0.6';
         }
         
-        function closeModal() { document.getElementById('photoModal').classList.add('hidden'); }
+        function closeModal() { 
+            document.getElementById('photoModal').classList.add('hidden'); 
+        }
 
         async function downloadPhoto() {
             if (!window.currentPhotoForDownload) return;
@@ -946,7 +1253,18 @@
                 const name = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${ext}`;
 
                 if (window.showSaveFilePicker) {
-                    const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Image Files', accept: {'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'], 'image/gif': ['.gif'], 'image/webp': ['.webp']} }] });
+                    const handle = await window.showSaveFilePicker({ 
+                        suggestedName: name, 
+                        types: [{ 
+                            description: 'Image Files', 
+                            accept: {
+                                'image/jpeg': ['.jpg', '.jpeg'], 
+                                'image/png': ['.png'], 
+                                'image/gif': ['.gif'], 
+                                'image/webp': ['.webp']
+                            } 
+                        }] 
+                    });
                     const writable = await handle.createWritable();
                     await writable.write(blob);
                     await writable.close();
@@ -972,15 +1290,19 @@
                 }
             } finally {
                 setTimeout(() => {
-                    btn.textContent = '📥 Download High-Res';
+                    btn.textContent = '🔥 Download Image';
                     btn.disabled = false;
                 }, 3000);
             }
         }
 
         /* ---------- Modal Event Listeners ---------- */
-        document.getElementById('photoModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        document.getElementById('photoModal').addEventListener('click', e => { 
+            if (e.target === e.currentTarget) closeModal(); 
+        });
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'Escape') closeModal(); 
+        });
 
         /* ---------- Game Functions ---------- */
         document.getElementById('startGame').addEventListener('click', startGame);
