@@ -1729,97 +1729,74 @@
             if (section === 'game') initializeGame();
         }
 
-        /* ---------- Download Functions ---------- */
-    async function downloadPhoto() {
+async function downloadPhoto() {
     if (!window.currentPhotoForDownload) return;
     const photo = window.currentPhotoForDownload;
     const btn = document.getElementById('downloadBtn');
     
-    try {
-        btn.textContent = 'Downloading...';
-        btn.disabled = true;
-        
-        const res = await fetch(photo.url);
-        const originalBlob = await res.blob();
-        
-        // Extract file extension more reliably
-        const urlParts = photo.url.split('?')[0]; // Remove query parameters first
-        const ext = urlParts.split('.').pop().toLowerCase();
-        
-        // Map extensions to proper MIME types
-        const mimeTypes = {
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'gif': 'image/gif',
-            'webp': 'image/webp'
-        };
-        
-        const correctMimeType = mimeTypes[ext] || 'image/jpeg';
-        
-        // Create a new blob with the correct MIME type
-        const blob = new Blob([originalBlob], { type: correctMimeType });
-        
-        const name = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${ext}`;
-
-        if (window.showSaveFilePicker) {
-            const handle = await window.showSaveFilePicker({ 
-                suggestedName: name, 
-                types: [{ 
-                    description: 'Image Files', 
-                    accept: {
-                        'image/jpeg': ['.jpg', '.jpeg'], 
-                        'image/png': ['.png'], 
-                        'image/gif': ['.gif'], 
-                        'image/webp': ['.webp']
-                    } 
-                }] 
-            });
-            const writable = await handle.createWritable();
-            await writable.write(blob);
-            await writable.close();
-            btn.textContent = 'Downloaded!';
-        } else {
-            // Fallback for mobile/other browsers
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = name;
-            
-            // Additional mobile-specific attributes
-            a.style.display = 'none';
-            a.target = '_blank';
-            
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up after a short delay to ensure download starts
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
-            
-            btn.textContent = 'Downloaded!';
-        }
-    } catch (error) {
-        console.error('Download failed:', error);
-        console.log('Original blob type:', originalBlob?.type); // Debug line
-        
-        if (error.name !== 'AbortError') {
-            window.open(photo.url, '_blank');
-            btn.textContent = 'Error - Opened in new tab';
-        } else {
-            btn.textContent = 'Cancelled';
-        }
-    } finally {
+    // Extract file extension and suggested name
+    const urlParts = photo.url.split('?')[0];
+    const ext = urlParts.split('.').pop().toLowerCase();
+    const name = `XZ_Photo_${photo.id}_${photo.month}_${photo.year}.${ext}`;
+    
+    const resetBtn = (message) => {
+        btn.textContent = message;
+        // Use the new instruction with Chinese translation for the final message
         setTimeout(() => {
             btn.innerHTML = `🔥 Download Single Image<br>
                 <small style="opacity: 1;">Slightly Compressed</small><br>
                 <small style="opacity: 1;">下载单图 (轻压缩)</small>`;
             btn.disabled = false;
         }, 3000);
+    };
+
+    try {
+        btn.textContent = 'Preparing... 准备中...';
+        btn.disabled = true;
+
+        // 1. Desktop/Modern Browser Logic (File System Access API)
+        if (window.showSaveFilePicker) {
+            const res = await fetch(photo.url);
+            const originalBlob = await res.blob();
+            
+            const mimeTypes = { 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp' };
+            const correctMimeType = mimeTypes[ext] || 'image/jpeg';
+            const blob = new Blob([originalBlob], { type: correctMimeType });
+
+            const handle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'Image Files', accept: { 'image/jpeg': ['.jpg', '.jpeg'] } }] });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            resetBtn('Downloaded! 下载完成! 🎉');
+
+        } else {
+            // 2. Mobile Fallback (Direct Link) - Requires a second user action
+            
+            const tempA = document.createElement('a');
+            tempA.href = photo.url;
+            tempA.target = '_blank';
+            tempA.download = name; 
+            
+            document.body.appendChild(tempA);
+            tempA.click();
+            document.body.removeChild(tempA);
+            
+            // CRITICAL: Clear instructions for the mobile user
+            resetBtn('New tab opened. 🎯 Long-press/Save Image. (已打开新页面，请长按保存)');
+        }
+
+    } catch (error) {
+        console.error('Download process failed:', error);
+        
+        if (error.name === 'AbortError') {
+            resetBtn('Cancelled 取消');
+        } else {
+            window.open(photo.url, '_blank');
+            resetBtn('Error. Opened in new tab. Save Manually. (错误，已打开新页，请手动保存)');
+        }
     }
 }
+
 
         /* ---------- Report Form Functions ---------- */
         function openReportModal() {
