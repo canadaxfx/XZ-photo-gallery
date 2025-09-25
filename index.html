@@ -402,6 +402,24 @@
             flex-shrink: 0;
         }
 
+        .close-bottom-btn {
+            font-size: 20px !important; /* Smaller size */
+            color: #000000 !important;
+            width: 30px;
+            height: 30px;
+            background: none !important;
+            border: 2px solid #e0e0e0 !important;
+            border-radius: 50%;
+            padding: 0;
+            margin-left: 10px;
+            line-height: 1;
+        }
+
+        .close-bottom-btn:hover {
+            background: #e9ecef !important;
+            transform: scale(1.1);
+        }
+
         /* Enhanced Download Section */
         .download-section {
             background: #f8f9fa;
@@ -1029,14 +1047,14 @@
                 </div>
             </div>
 
-            <!-- Photo Actions Panel -->
             <div class="photo-info-panel">
-                <!-- Enhanced Download Section -->
                 <div class="download-section">
-                    <h4>🔥Download Options & Links</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h4 style="margin: 0; flex-grow: 1; text-align: center;">🔥Download Options & Links</h4>
+                        <button class="close-modal close-bottom-btn" onclick="closeModal()">×</button>
+                    </div>
                     
-                    <div class="download-actions-row" id="actionButtonsRow">
-                        <button class="action-btn download-btn" id="downloadBtn" onclick="downloadPhoto()">
+                    <div class="download-actions-row" id="actionButtonsRow">                        <button class="action-btn download-btn" id="downloadBtn" onclick="downloadPhoto()">
                             🔥Download Single Image<br>
                             <small style="opacity: 1;">Slightly Compressed</small><br>
                             <small style="opacity: 1;">下载单图 (轻压缩)</small>
