@@ -1828,34 +1828,6 @@ async function downloadPhoto() {
         let lastSubmissionTime = 0;
         const SUBMISSION_COOLDOWN = 30000; // 30 seconds
 
-        // Handle report form submission
-        document.addEventListener('DOMContentLoaded', () => {
-            const reportForm = document.getElementById('reportForm');
-            if (reportForm) {
-                reportForm.addEventListener('submit', function(e) {
-                    // Check rate limiting
-                    const now = Date.now();
-                    if (now - lastSubmissionTime < SUBMISSION_COOLDOWN) {
-                        e.preventDefault();
-                        alert('Please wait 30 seconds between submissions.');
-                        return;
-                    }
-                    lastSubmissionTime = now;
-                    
-                    // Let FormSubmit handle the submission, just show feedback
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Sending...';
-                    submitBtn.disabled = true;
-                    
-                    // Re-enable button after a delay (FormSubmit will redirect)
-                    setTimeout(() => {
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
-                    }, 3000);
-                });
-            }
-        });
 
         /* ---------- Modal Event Listeners ---------- */
         document.getElementById('photoModal').addEventListener('click', e => { 
