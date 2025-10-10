@@ -1373,43 +1373,61 @@
         });
 
         /* ---------- Data Loading ---------- */
-        async function loadPhotoData() {
+async function loadPhotoData() {
+    try {
+        // Define your data sources
+        const yearFiles = [2025, 2024, 2023, 2022];
+        const customFiles = ["miscellaneous"]; // Add any custom filename here (without .json)
+        
+        let allPhotos = [];
+        
+        // Load year files
+        for (const year of yearFiles) {
             try {
-                const years = [2025, 2024, 2023];
-                let allPhotos = [];
-                for (const year of years) {
-                    try {
-                        const res = await fetch(`${year}.json?v=${Date.now()}`, { cache: 'no-store' });
-                        if (res.ok) {
-                            const yearData = await res.json();
-                            if (Array.isArray(yearData)) allPhotos.push(...yearData);
-                        }
-                    } catch (err) {
-                        console.log(`No ${year}.json found, skipping`);
-                    }
+                const res = await fetch(`${year}.json?v=${Date.now()}`, { cache: 'no-store' });
+                if (res.ok) {
+                    const yearData = await res.json();
+                    if (Array.isArray(yearData)) allPhotos.push(...yearData);
                 }
-                
-                if (allPhotos.length === 0) {
-                    console.log('No year files found, trying photoData.json...');
-                    const res = await fetch(`photoData.json?v=${Date.now()}`, { cache: 'no-store' });
-                    if (res.ok) allPhotos = await res.json();
-                }
-                
-                if (!Array.isArray(allPhotos) || allPhotos.length === 0) throw new Error('No valid photo data found');
-                
-                allPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
-                allPhotos.forEach((photo, index) => { photo.id = index + 1; });
-                
-                photoData = allPhotos;
-                initializeTimeline();
-                
             } catch (err) {
-                console.error('Failed to load photo data:', err);
-                document.getElementById('timelineContainer').innerHTML = `
-                    <div class="timeline-empty"><h3>Could not load photo data</h3><p>Please check your connection and refresh.</p></div>`;
+                console.log(`No ${year}.json found, skipping`);
             }
         }
-
+        
+        // Load custom files
+        for (const customFile of customFiles) {
+            try {
+                const res = await fetch(`${customFile}.json?v=${Date.now()}`, { cache: 'no-store' });
+                if (res.ok) {
+                    const customData = await res.json();
+                    if (Array.isArray(customData)) allPhotos.push(...customData);
+                }
+            } catch (err) {
+                console.log(`No ${customFile}.json found, skipping`);
+            }
+        }
+        
+        // Fallback to photoData.json if nothing loaded
+        if (allPhotos.length === 0) {
+            console.log('No files found, trying photoData.json...');
+            const res = await fetch(`photoData.json?v=${Date.now()}`, { cache: 'no-store' });
+            if (res.ok) allPhotos = await res.json();
+        }
+        
+        if (!Array.isArray(allPhotos) || allPhotos.length === 0) throw new Error('No valid photo data found');
+        
+        allPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+        allPhotos.forEach((photo, index) => { photo.id = index + 1; });
+        
+        photoData = allPhotos;
+        initializeTimeline();
+        
+    } catch (err) {
+        console.error('Failed to load photo data:', err);
+        document.getElementById('timelineContainer').innerHTML = `
+            <div class="timeline-empty"><h3>Could not load photo data</h3><p>Please check your connection and refresh.</p></div>`;
+    }
+}
         /* ---------- Timeline & Pagination Functions ---------- */
         function initializeTimeline() {
             if (photoData.length === 0) {
